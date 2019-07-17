@@ -6,6 +6,7 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 # Load libraries
 import numpy as np
 from brian2 import *
+from neurodynex.working_memory_network import wm_model
 
 from utility_functions import *
 
