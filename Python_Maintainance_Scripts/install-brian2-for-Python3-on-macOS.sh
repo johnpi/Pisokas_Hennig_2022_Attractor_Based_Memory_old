@@ -5,14 +5,14 @@
 # ===========================
 
 echo -n "Is pip3 installed? "
-if python -m pip3 --version 2> /dev/null
+if python3 -m pip --version 2> /dev/null
 then
   echo "YES"
 else
   echo "NO"
   echo "Installing pip in the user account..."
   easy_install --user pip3
-  python -m pip3 install --upgrade --user --no-binary :all: pip3
+  python3 -m pip install --upgrade --user --no-binary :all: pip3
   echo 
 fi
 
@@ -29,15 +29,15 @@ fi
 
 echo 
 echo "Installing packages required by Brian2 and Brian2 itself..."
-python -m pip3 install --upgrade --user --no-binary :all: Cython      && \
-python -m pip3 install --upgrade --user --no-binary :all: nose        && \
-python -m pip3 install --upgrade --user --no-binary :all: brian2      && \
-python -m pip3 install --upgrade --user --no-binary :all: brian2tools && \
+python3 -m pip install --upgrade --user --no-binary :all: Cython      && \
+python3 -m pip install --upgrade --user --no-binary :all: nose        && \
+python3 -m pip install --upgrade --user --no-binary :all: brian2      && \
+python3 -m pip install --upgrade --user --no-binary :all: brian2tools && \
 echo "Brian2 was installed successfully."
 
 echo 
 echo "Installing extras: Jupyter notebooks"
-python -m pip3 install --upgrade --user --no-binary :all: jupyter
+python3 -m pip install --upgrade --user --no-binary :all: jupyter
 
 echo 
 echo "To test the installation of Brian2 I run"
