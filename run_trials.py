@@ -105,7 +105,7 @@ network_parameters = [
 # Collect data for three network sizes and 9 stimulus headings
 for i, network_param in enumerate(network_parameters):
     for stim_degrees in xrange(0, 360+1, 45):
-        print('Experiment: {:3}  stim_degrees = {:3}'.format(i, stim_degrees))
+        print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
         run_trials(num_of_trials         = 40, 
                    collected_data_file   = collected_data_file, 
                    stimulus_center_deg   = stim_degrees,
