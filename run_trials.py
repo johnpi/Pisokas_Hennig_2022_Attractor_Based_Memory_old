@@ -4,6 +4,7 @@
 from __future__ import division, print_function, unicode_literals, absolute_import
 
 # Load libraries
+import sys
 import numpy as np
 from brian2 import *
 from neurodynex.working_memory_network import wm_model
@@ -25,7 +26,8 @@ def run_trials(num_of_trials         = 20,
                weight_scaling_factor = 2.0,
                sim_time_duration     = 10000. * ms,
                t_window_width      = 200*ms,
-               snapshot_interval   = 100*ms
+               snapshot_interval   = 100*ms,
+               synaptic_noise_amount = 0.0
               ):
     """
         Runs trials of the activity bump drift and collects corresponding time series
@@ -61,15 +63,15 @@ def run_trials(num_of_trials         = 20,
 
 
     for iteration in range(num_of_trials):
-        print('Trial: {:3}'.format(iteration+1))
-        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration)
-
+        print('Trial: ', iteration+1)
+        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount)
+        
         t_snapshots = range(
             int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
             int(math.floor((sim_time_duration-t_window_width/2)/ms)),  # Subtract half window. Avoids an out-of-bound error later.
             int(round(snapshot_interval/ms))  # spacing between time stamps
             )*ms
-
+        
         # Calculate the population vector angle theta
         theta_ts = get_theta_time_series_vec_add(spike_monitor_excit, idx_monitored_neurons_excit, N_excitatory, t_snapshots, t_window_width)
 
@@ -84,6 +86,7 @@ def run_trials(num_of_trials         = 20,
         collected_data['N_excitatory'] = N_excitatory
         collected_data['N_inhibitory'] = N_inhibitory
         collected_data['weight_scaling_factor'] = weight_scaling_factor
+        collected_data['synaptic_noise_amount'] = synaptic_noise_amount
 
         # Data
         #collected_data['rate_monitor_excit'] = rate_monitor_excit
@@ -113,6 +116,38 @@ network_parameters = [
     #(512,  128, 4.0)
 ]
 
+synaptic_noise_amount_list = [0.01, 0.05, 0.1, 0.5]
+
+
+# Collect data for three network sizes and 9 stimulus headings
+def explore_heading_angles():
+    for i, network_param in enumerate(network_parameters):
+        for stim_degrees in range(0, 360+1, 45):
+            print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
+            run_trials(num_of_trials         = 20, 
+                       collected_data_file   = 'Data/collected_drift_trials.npy', 
+                       stimulus_center_deg   = stim_degrees,
+                       N_excitatory          = network_param[0],
+                       N_inhibitory          = network_param[1],
+                       weight_scaling_factor = network_param[2],
+                       sim_time_duration     = 10000. * ms,
+                       synaptic_noise_amount = 0.0
+                      )
+
+# Collect data for three network sizes and different noise levels
+def explore_noise_levels():
+    for i, network_param in enumerate(network_parameters):
+        for synaptic_noise_amount in synaptic_noise_amount_list:
+            print('Experiment: {:3}  synaptic_noise_amount = {:3}'.format(i+1, synaptic_noise_amount))
+            run_trials(num_of_trials         = 20, 
+                       collected_data_file   = 'Data/collected_drift_trials.npy', 
+                       stimulus_center_deg   = 180,
+                       N_excitatory          = network_param[0],
+                       N_inhibitory          = network_param[1],
+                       weight_scaling_factor = network_param[2],
+                       sim_time_duration     = 10000. * ms,
+                       synaptic_noise_amount = synaptic_noise_amount
+                      )
 
 # Collect data for three network sizes and 9 stimulus headings
 for i, network_param in enumerate(network_parameters):
@@ -126,3 +161,13 @@ for i, network_param in enumerate(network_parameters):
                    weight_scaling_factor = network_param[2],
                    sim_time_duration     = 10000. * ms
                   )
+
+# Main program
+if len(sys.argv) == 0 or str(sys.argv[0]) == 'explore=everything':
+    explore_heading_angles()
+    explore_noise_levels()
+elif str(sys.argv[0]) == 'explore=angles':
+    explore_heading_angles()
+elif str(sys.argv[0]) == 'explore=noise':
+    explore_noise_levels()
+

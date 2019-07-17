@@ -137,3 +137,52 @@ def get_theta_time_series(spike_monitor, idx_monitored_neurons, total_num_of_neu
 
     return theta_time_series
 
+
+# Experimental and untested
+
+def add_gaussian_white_noise_by_variance(data, variance):
+    """
+        Adds Additive Gaussian White Noise to the given data.
+        data : an numpy array with the data to noisify.
+        variance : the gaussian noise variance. 
+        Since the average power of a random variable $X$ is $E[X^2] = \mu^2 + \sigma^2$ 
+        and we set $\mu = 0$, it follows that $E[X^2] = \sigma^2$ thus the power of the 
+        variable is determined by its variance. 
+        Returns : the data with added noise.
+    """
+    sigma_sd = np.sqrt(variance)
+    noise = np.random.normal(loc=0., scale=sigma_sd, size=np.array(data).shape)
+    noisy_data = np.array(data) + noise
+    if isinstance(data, list):
+        noisy_data = noisy_data.tolist()
+    return noisy_data
+
+def add_gaussian_white_noise_by_magnitude(data, noise_portion):
+    """
+        Adds Additive Gaussian White Noise to the given data. Assumes that the data in the 
+        array 'data' are representative of the possible values in the population for 
+        calculating the power of the signal. 
+        data            : an numpy array with the data to noisify.
+        noise_magnitude : the amount of noise to add. Let that be a portion of noise in (0,1)
+        Returns         : the data with added noise.
+    """
+    signal_amplitude = np.max(np.max(data)) # - np.min(np.min(data))
+    signal_power = signal_amplitude ** 2
+    signal_power_dB = 10. * np.log10(signal_power)
+    
+    signal_av_power = np.mean(signal_power)
+    signal_av_power_dB = 10. * np.log10(signal_av_power)
+    target_noise_av_power = noise_portion * signal_av_power
+    target_noise_av_power_dB = 10. * np.log10(target_noise_av_power) # This results to -inf for target_noise_av_power=0. Dont worry about the warning that there was division by 0 in log10.
+    #target_noise_av_power_dB = 10. * np.log10(np.max([target_noise_av_power, 10**-100])) # To avoid division by 0 (not really needed)
+    #target_SNR = signal_av_power / target_noise_av_power # Danger of division by 0
+    #target_SNR_dB = 10. * np.log10(target_SNR)
+    target_SNR_dB = signal_av_power_dB - target_noise_av_power_dB
+    
+    noise_av_dB = signal_av_power_dB - target_SNR_dB
+    noise_av_power = 10. ** (noise_av_dB / 10.)
+    
+    variance = noise_av_power
+    
+    noisy_data = add_gaussian_white_noise_by_variance(data, variance)
+    return noisy_data
