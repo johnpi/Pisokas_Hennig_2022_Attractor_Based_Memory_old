@@ -54,7 +54,7 @@ def run_trials(num_of_trials         = 20,
     #N_inhibitory          = 256  # 512
     #weight_scaling_factor = 2.0 # 4.0
 
-    for iteration in xrange(num_of_trials):
+    for iteration in range(num_of_trials):
         print('Trial: {:3}'.format(iteration+1))
         rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration)
 
@@ -104,7 +104,7 @@ network_parameters = [
 
 # Collect data for three network sizes and 9 stimulus headings
 for i, network_param in enumerate(network_parameters):
-    for stim_degrees in xrange(0, 360+1, 45):
+    for stim_degrees in range(0, 360+1, 45):
         print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
         run_trials(num_of_trials         = 40, 
                    collected_data_file   = collected_data_file, 
