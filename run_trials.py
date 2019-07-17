@@ -108,9 +108,9 @@ def run_trials(num_of_trials         = 20,
 # Network hyper-parameter
 # [(N_excitatory, N_inhibitory, weight_scaling_factor), ...]
 network_parameters = [
-    (1024, 256, 2.0),
-    (2048, 512, 1.0),
-    (512,  128, 4.0)
+    (1024, 256, 2.0) #,
+    #(2048, 512, 1.0),
+    #(512,  128, 4.0)
 ]
 
 
@@ -118,7 +118,7 @@ network_parameters = [
 for i, network_param in enumerate(network_parameters):
     for stim_degrees in range(0, 360+1, 45):
         print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
-        run_trials(num_of_trials         = 40, 
+        run_trials(num_of_trials         = 10, 
                    collected_data_file   = collected_data_file, 
                    stimulus_center_deg   = stim_degrees,
                    N_excitatory          = network_param[0],
