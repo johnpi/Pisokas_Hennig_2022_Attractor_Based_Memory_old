@@ -23,7 +23,9 @@ def run_trials(num_of_trials         = 20,
                N_excitatory          = 1024,
                N_inhibitory          = 256,
                weight_scaling_factor = 2.0,
-               sim_time_duration     = 10000. * ms
+               sim_time_duration     = 10000. * ms,
+               t_window_width      = 200*ms,
+               snapshot_interval   = 100*ms
               ):
     """
         Runs trials of the activity bump drift and collects corresponding time series
@@ -54,9 +56,19 @@ def run_trials(num_of_trials         = 20,
     #N_inhibitory          = 256  # 512
     #weight_scaling_factor = 2.0 # 4.0
 
+    #t_window_width      = 200*ms
+    #snapshot_interval   = 100*ms
+
+
     for iteration in range(num_of_trials):
         print('Trial: {:3}'.format(iteration+1))
         rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration)
+
+        t_snapshots = range(
+            int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
+            int(math.floor((sim_time_duration-t_window_width/2)/ms)),  # Subtract half window. Avoids an out-of-bound error later.
+            int(round(snapshot_interval/ms))  # spacing between time stamps
+            )*ms
 
         # Calculate the population vector angle theta
         theta_ts = get_theta_time_series_vec_add(spike_monitor_excit, idx_monitored_neurons_excit, N_excitatory, t_snapshots, t_window_width)
