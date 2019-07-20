@@ -8,10 +8,11 @@ import sys
 import numpy as np
 from brian2 import *
 from neurodynex.working_memory_network import wm_model
+from neurodynex.working_memory_network import wm_model_modified
 
 from utility_functions import *
 
-collected_data_file = 'Data/collected_drift_trials.npy' # The file to store the collected trials data
+collected_data_file = 'Data/collected_drift_trials_v2.npy' # The file to store the collected trials data
 
 
 def run_trials(num_of_trials         = 20, 
@@ -97,7 +98,11 @@ def run_trials(num_of_trials         = 20,
         collected_data['spike_monitor_inhib'] = spike_monitor_inhib.spike_trains()
         #collected_data['voltage_monitor_inhib'] = voltage_monitor_inhib
         collected_data['idx_monitored_neurons_inhib'] = idx_monitored_neurons_inhib
-        collected_data['theta_ts'] = theta_ts
+        
+        collected_data['t_window_width']    = t_window_width
+        collected_data['snapshot_interval'] = snapshot_interval
+        collected_data['t_snapshots']       = t_snapshots
+        collected_data['theta_ts']          = theta_ts
         # Add new data record to the collected trials data
         collected_trials_data = np.append(collected_trials_data, collected_data)
 
@@ -111,9 +116,9 @@ def run_trials(num_of_trials         = 20,
 # Network hyper-parameter
 # [(N_excitatory, N_inhibitory, weight_scaling_factor), ...]
 network_parameters = [
-    (1024, 256, 2.0) #,
-    #(2048, 512, 1.0),
-    #(512,  128, 4.0)
+    (512,  128, 4.0),
+    (1024, 256, 2.0),
+    (2048, 512, 1.0)
 ]
 
 synaptic_noise_amount_list = [0.01, 0.05, 0.1, 0.5]
@@ -122,10 +127,10 @@ synaptic_noise_amount_list = [0.01, 0.05, 0.1, 0.5]
 # Collect data for three network sizes and 9 stimulus headings
 def explore_heading_angles():
     for i, network_param in enumerate(network_parameters):
-        for stim_degrees in range(0, 360+1, 45):
+        for stim_degrees in range(0, 360, 45):
             print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
-            run_trials(num_of_trials         = 20, 
-                       collected_data_file   = 'Data/collected_drift_trials.npy', 
+            run_trials(num_of_trials         = 1, 
+                       collected_data_file   = collected_data_file, 
                        stimulus_center_deg   = stim_degrees,
                        N_excitatory          = network_param[0],
                        N_inhibitory          = network_param[1],
@@ -139,8 +144,8 @@ def explore_noise_levels():
     for i, network_param in enumerate(network_parameters):
         for synaptic_noise_amount in synaptic_noise_amount_list:
             print('Experiment: {:3}  synaptic_noise_amount = {:3}'.format(i+1, synaptic_noise_amount))
-            run_trials(num_of_trials         = 20, 
-                       collected_data_file   = 'Data/collected_drift_trials.npy', 
+            run_trials(num_of_trials         = 10, 
+                       collected_data_file   = collected_data_file, 
                        stimulus_center_deg   = 180,
                        N_excitatory          = network_param[0],
                        N_inhibitory          = network_param[1],
@@ -149,25 +154,16 @@ def explore_noise_levels():
                        synaptic_noise_amount = synaptic_noise_amount
                       )
 
-# Collect data for three network sizes and 9 stimulus headings
-for i, network_param in enumerate(network_parameters):
-    for stim_degrees in range(0, 360+1, 45):
-        print('Experiment: {:3}  stim_degrees = {:3}'.format(i+1, stim_degrees))
-        run_trials(num_of_trials         = 10, 
-                   collected_data_file   = collected_data_file, 
-                   stimulus_center_deg   = stim_degrees,
-                   N_excitatory          = network_param[0],
-                   N_inhibitory          = network_param[1],
-                   weight_scaling_factor = network_param[2],
-                   sim_time_duration     = 10000. * ms
-                  )
+
 
 # Main program
-if len(sys.argv) == 0 or str(sys.argv[0]) == 'explore=everything':
+if len(sys.argv) < 2 or str(sys.argv[0]) == 'explore=everything':
     explore_heading_angles()
     explore_noise_levels()
-elif str(sys.argv[0]) == 'explore=angles':
+elif str(sys.argv[1]) == 'explore=angles':
     explore_heading_angles()
-elif str(sys.argv[0]) == 'explore=noise':
+elif str(sys.argv[1]) == 'explore=noise':
     explore_noise_levels()
+else:
+    print('Error: Unknown command line argument given. ARG: {}'.format(sys.argv))
 

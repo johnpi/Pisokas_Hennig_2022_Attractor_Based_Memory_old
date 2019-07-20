@@ -138,6 +138,130 @@ def get_theta_time_series(spike_monitor, idx_monitored_neurons, total_num_of_neu
     return theta_time_series
 
 
+
+# Functions for selecting records matching conditions from list. 
+
+def check_value(record, key, expected_value):
+    """
+        Returns True if the dictionary record contains a key 
+        named 'key' with value equal to expected_value.
+    """
+    if key in record and record[key] == expected_value:
+        return True
+    return False
+    
+def pick_data_samples(collected_data_file, 
+                      stimulus_center_deg   = None,
+                      stimulus_width_deg    = None,
+                      sim_time_duration     = None,
+                      N_excitatory          = None,
+                      synaptic_noise_amount = None, 
+                      operator              = 'or'  # Records with at least one matching value are returned
+                     ):
+    
+    """
+        From a collection of records stored in a list or np.array it selects 
+        only those satisfying the specified conditions. The conditions are 
+        values that keys in each record must have. Only keys with not None 
+        value are considered. The conditions are checked in an OR fashion if 
+        operator is 'or' but in and AND fashion if operator is 'and'. 
+        It returns a list containing only the matching records. 
+        
+        collected_data_file     : The data file to read records list from.
+        operator (default 'or') : If 'or' records with at least one matching value are returned.
+                                  If 'and' only records matching all values are returned.
+        All other arguments are the conditions to check. The name of each argument variable is 
+        used as the key and its value as the constraint. 
+    """
+    
+    args = locals() # Get function arguments as dict()
+    args['collected_data_file'] = None # Set to None so that it is ignored in the iterator later
+    args['operator']            = None # Set to None so that it is ignored in the iterator later
+    
+    # Try to load existing data if any otherwise create an empty collection
+    try:
+        collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
+    except: 
+        collected_trials_data = np.array([]) # Collected trials data records list
+
+    selected_data_items = []
+    
+    # Iterate over all records in the loaded data file and select those 
+    # matching *at least one* of the specified expected values. That is, 
+    # a selection using an OR operator across the specified values. 
+    for i, item in enumerate(collected_trials_data):
+        # Iterate over function arguments
+        for arg_key, arg_value in list(args.items()):
+            if arg_value is not None:
+                if check_value(item, key=arg_key, expected_value=arg_value):
+                    selected_data_items.append(item)
+
+    # Now remove the records that do not satisfy all specified values. 
+    # That is, an AND operation.
+    items_to_remove_list = []
+    if operator == 'and':
+        for i, item in enumerate(selected_data_items):
+            # Iterate over function arguments
+            for arg_key, arg_value in list(args.items()):
+                if arg_value is not None:
+                    if not check_value(item, key=arg_key, expected_value=arg_value):
+                        items_to_remove_list.append(i) # indices of items to remove
+    # remove the records
+    selected_data_items_and_op = [selected_data_items[i] for i, elem in enumerate(selected_data_items) if i not in items_to_remove_list]
+    selected_data_items = selected_data_items_and_op
+    
+    return selected_data_items
+
+# Example usage:
+#selected_data_items = pick_data_samples('Data/collected_drift_trials_v2_angles.npy', 
+#                      stimulus_center_deg   = 180,
+#                      stimulus_width_deg    = None,
+#                      sim_time_duration     = None,
+#                      N_excitatory          = 1024,
+#                      synaptic_noise_amount = None, 
+#                      operator              = 'or'  # Records with at least one matching value are returned
+#                     )
+
+
+
+def mean_absolute_deviation(expected_value, time_series_list):
+    """
+        Returns the mean absolute deviation (MAD) of time series produced 
+        by multiple trials at each point in time. That is a measure of 
+        dispersion over time. 
+        $MAD = \frac{1}{N} \sum_{i=0}^{N} \abs{x_{i} - mean(X)}$ 
+        MAD is a better measure than standard deviation (SD). 
+        
+        expected_value   : The expected value for MAD normally is the mean of 
+                           the sample. That is the mean value of all time series 
+                           at that point in time. However you can provide 
+                           any expected value here.
+        time_series_list : A list or np.array containing np.arrays of several 
+                           time series. All time series must have the same 
+                           number of items. 
+        Returns          : A time series with elements the MAD at each point in 
+                           time. It has the same number of items as the contained 
+                           time series. 
+    """
+    
+    # The absolute value of the differences of the time series samples from the expected value
+    
+    abs_diff_list = []
+    # Get the absolute deviation of each item of the series from the expected value
+    for ts in time_series_list:
+        abs_diff = np.abs(np.ones(len(ts)) * expected_value - ts)
+        abs_diff_list.append(abs_diff)
+    
+    # Get the mean absolute deviation across all time series at each point in time
+    abs_diff_mean = np.mean(abs_diff_list, axis=0)
+    
+    return abs_diff_mean
+
+
+
+
+
+
 # Experimental and untested
 
 def add_gaussian_white_noise_by_variance(data, variance):
@@ -159,6 +283,18 @@ def add_gaussian_white_noise_by_variance(data, variance):
 
 def add_gaussian_white_noise_by_magnitude(data, noise_portion):
     """
+        Details on the computation at 
+            https://stackoverflow.com/questions/14058340/adding-noise-to-a-signal-in-python
+            https://uk.mathworks.com/matlabcentral/answers/40772-snr-in-awgn
+            https://dsp.stackexchange.com/questions/33849/adding-awgn-noise-with-a-correct-noise-power-to-the-signal
+            
+            https://www.tcd.ie/Physics/research/groups/magnetism/files/lectures/py5021/MagneticSensors3.pdf
+            http://www.commsp.ee.ic.ac.uk/~cling/Com/Problems.pdf
+            http://web.mit.edu/6.02/www/f2010/handouts/lectures/L4-notes.pdf
+            https://web.stanford.edu/group/cioffi/doc/book/chap1.pdf
+            https://dsp.stackexchange.com/questions/30822/additive-gaussian-white-noise-bandwidth
+            https://www.gaussianwaves.com/2015/06/how-to-generate-awgn-noise-in-matlaboctave-without-using-in-built-awgn-function/
+        
         Adds Additive Gaussian White Noise to the given data. Assumes that the data in the 
         array 'data' are representative of the possible values in the population for 
         calculating the power of the signal. 
@@ -186,3 +322,45 @@ def add_gaussian_white_noise_by_magnitude(data, noise_portion):
     
     noisy_data = add_gaussian_white_noise_by_variance(data, variance)
     return noisy_data
+
+
+
+# Not perfect but works well enough
+def unwrap_modulo_time_series(data_time_series, modulo = 360):
+    """
+        Gets a time series with values wrapped around a modulo value, 
+        such as heading angles wrapped around a 360 degree circle, and 
+        returns an unwrapped time series. It assumes that heading angle 
+        values move around the circle continuously so jumps from near 0 
+        to near 360 degrees and vice versa are intrepreted as incremental 
+        angle changes. 
+        Tested with additive gaussian white noise and can tolerate up 
+        to 1/SNR = 2*10^-7
+    """
+    modulo_range = [0, modulo]
+    dp_mod = data_time_series
+
+    dp_step_diffs  = np.array([])
+    dp_reconstruct = np.array([])
+
+    for i,d in enumerate(dp_mod):
+        if i == 0:
+            init_value = dp_mod[i]
+            dp_step_diffs = np.append(dp_step_diffs, 0)
+        else:
+            step_diff = dp_mod[i] - dp_mod[i-1]
+            dp_step_diffs = np.append(dp_step_diffs, step_diff)
+
+    for i,d in enumerate(dp_mod):
+        if i == 0:
+            dp_reconstruct = np.append(dp_reconstruct, init_value)
+        elif np.abs(dp_step_diffs[i]) < modulo_range[1] / 2:
+            dp_reconstruct = np.append(dp_reconstruct, dp_reconstruct[-1] + dp_step_diffs[i])
+        else:
+            if dp_step_diffs[i] < 0: # The curve was going increasing value
+                dp_reconstruct = np.append(dp_reconstruct, dp_reconstruct[-1] + dp_step_diffs[i] + modulo_range[1])
+            else:                    # The curve was going decreasing value
+                dp_reconstruct = np.append(dp_reconstruct, dp_reconstruct[-1] + dp_step_diffs[i] - modulo_range[1])
+    
+    # Return recorstructed time series
+    return dp_reconstruct
