@@ -38,6 +38,7 @@ echo "Brian2 was installed successfully."
 echo 
 echo "Installing extras: Jupyter notebooks"
 python -m pip install --upgrade --user --no-binary :all: jupyter
+python -m pip install --upgrade --user --no-binary :all: deepdiff
 
 echo 
 echo "To test the installation of Brian2 I run"
