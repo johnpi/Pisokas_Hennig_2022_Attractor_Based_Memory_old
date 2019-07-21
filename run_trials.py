@@ -118,7 +118,8 @@ def run_trials(num_of_trials         = 20,
 network_parameters = [
     (512,  128, 4.0),
     (1024, 256, 2.0),
-    (2048, 512, 1.0)
+    (2048, 512, 1.0),
+    (8192, 2048, 0.25)
 ]
 
 synaptic_noise_amount_list = [0.01, 0.05, 0.1, 0.5]
