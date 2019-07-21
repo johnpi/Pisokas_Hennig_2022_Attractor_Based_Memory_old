@@ -12,7 +12,7 @@ from neurodynex.working_memory_network import wm_model_modified
 
 from utility_functions import *
 
-collected_data_file = 'Data/collected_drift_trials_v2.npy' # The file to store the collected trials data
+collected_data_file = 'Data/collected_drift_trials_v2_180_1024_noise.npy' # The file to store the collected trials data
 
 
 def run_trials(num_of_trials         = 20, 
