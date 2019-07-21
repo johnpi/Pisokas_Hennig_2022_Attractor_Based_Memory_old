@@ -14,7 +14,9 @@ collected_data_files_list = [
     'Data/collected_drift_trials.npy',
     'Data/collected_drift_trials_v2_angles.npy',
     'Data/collected_drift_trials_v2_noise.npy',
-    'Data/collected_drift_trials_v2_noise_Ne2048.npy'
+    'Data/collected_drift_trials_v2_Ne512_noise.npy',
+    'Data/collected_drift_trials_v2_noise_Ne2048.npy',
+    'Data/collected_drift_trials_v2_Ne4096_noise.npy'
 ]
 
 # File to store all the data to
