@@ -158,6 +158,7 @@ def select_records_from_list(dicts_list, selectors, operator):
         on the operator.
     """
     selected_data_items = []
+    track_selected_items_indxs = []   # Keeps track of which items in the list have already been selected to avoid double entries
     
     # Iterate over all records in the loaded data file and select those 
     # matching *at least one* of the specified expected values. That is, 
@@ -167,7 +168,9 @@ def select_records_from_list(dicts_list, selectors, operator):
         for arg_key, arg_value in list(selectors.items()):
             if arg_value is not None:
                 if check_value(item, key=arg_key, expected_value=arg_value):
-                    selected_data_items.append(item)
+                    if not i in track_selected_items_indxs:
+                        selected_data_items.append(item)
+                        track_selected_items_indxs.append(i)
 
     # Now remove the records that do not satisfy all specified values. 
     # That is, an AND operation.
