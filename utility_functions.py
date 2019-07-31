@@ -149,7 +149,52 @@ def check_value(record, key, expected_value):
     if key in record and record[key] == expected_value:
         return True
     return False
+
+def select_records_from_list(dicts_list, selectors, operator):
+    """
+        Gets a list of dicts and a dict of selector field-value pairs 
+        and a logical operator 'or' or 'and'. Returns a list of only 
+        the dict entries that satisfy the conditions in selectors based
+        on the operator.
+    """
+    selected_data_items = []
     
+    # Iterate over all records in the loaded data file and select those 
+    # matching *at least one* of the specified expected values. That is, 
+    # a selection using an OR operator across the specified values. 
+    for i, item in enumerate(dicts_list):
+        # Iterate over function arguments
+        for arg_key, arg_value in list(selectors.items()):
+            if arg_value is not None:
+                if check_value(item, key=arg_key, expected_value=arg_value):
+                    selected_data_items.append(item)
+
+    # Now remove the records that do not satisfy all specified values. 
+    # That is, an AND operation.
+    items_to_remove_list = []
+    if operator == 'and':
+        for i, item in enumerate(selected_data_items):
+            # Iterate over function arguments
+            for arg_key, arg_value in list(selectors.items()):
+                if arg_value is not None:
+                    if not check_value(item, key=arg_key, expected_value=arg_value):
+                        items_to_remove_list.append(i) # indices of items to remove
+    # remove the records
+    selected_data_items_and_op = [selected_data_items[i] for i, elem in enumerate(selected_data_items) if i not in items_to_remove_list]
+    selected_data_items = selected_data_items_and_op
+    
+    return selected_data_items
+
+
+# Example usage:
+#selected_data_items = pick_data_samples('Data/collected_drift_trials_v2_angles.npy', 
+#                      stimulus_center_deg   = 180,
+#                      stimulus_width_deg    = None,
+#                      sim_time_duration     = None,
+#                      N_excitatory          = 1024,
+#                      synaptic_noise_amount = None, 
+#                      operator              = 'or'  # Records with at least one matching value are returned
+#                     )
 def pick_data_samples(collected_data_file, 
                       stimulus_center_deg   = None,
                       stimulus_width_deg    = None,
@@ -184,43 +229,9 @@ def pick_data_samples(collected_data_file,
     except: 
         collected_trials_data = np.array([]) # Collected trials data records list
 
-    selected_data_items = []
-    
-    # Iterate over all records in the loaded data file and select those 
-    # matching *at least one* of the specified expected values. That is, 
-    # a selection using an OR operator across the specified values. 
-    for i, item in enumerate(collected_trials_data):
-        # Iterate over function arguments
-        for arg_key, arg_value in list(args.items()):
-            if arg_value is not None:
-                if check_value(item, key=arg_key, expected_value=arg_value):
-                    selected_data_items.append(item)
-
-    # Now remove the records that do not satisfy all specified values. 
-    # That is, an AND operation.
-    items_to_remove_list = []
-    if operator == 'and':
-        for i, item in enumerate(selected_data_items):
-            # Iterate over function arguments
-            for arg_key, arg_value in list(args.items()):
-                if arg_value is not None:
-                    if not check_value(item, key=arg_key, expected_value=arg_value):
-                        items_to_remove_list.append(i) # indices of items to remove
-    # remove the records
-    selected_data_items_and_op = [selected_data_items[i] for i, elem in enumerate(selected_data_items) if i not in items_to_remove_list]
-    selected_data_items = selected_data_items_and_op
+    selected_data_items = select_records_from_list(collected_trials_data, args, operator)
     
     return selected_data_items
-
-# Example usage:
-#selected_data_items = pick_data_samples('Data/collected_drift_trials_v2_angles.npy', 
-#                      stimulus_center_deg   = 180,
-#                      stimulus_width_deg    = None,
-#                      sim_time_duration     = None,
-#                      N_excitatory          = 1024,
-#                      synaptic_noise_amount = None, 
-#                      operator              = 'or'  # Records with at least one matching value are returned
-#                     )
 
 
 
