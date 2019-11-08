@@ -5,6 +5,8 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 
 # Load libraries
 import sys
+import argparse # For command line argument parsing
+
 import numpy as np
 from brian2 import *
 from neurodynex.working_memory_network import wm_model
@@ -115,6 +117,8 @@ def run_trials(num_of_trials         = 20,
 
 # Network hyper-parameter
 # [(N_excitatory, N_inhibitory, weight_scaling_factor), ...]
+# Obsolete
+
 network_parameters = [
     (512,  128, 4.0),
     (1024, 256, 2.0),
@@ -122,10 +126,21 @@ network_parameters = [
     (4096, 1024, 0.5),
     (8192, 2048, 0.25)
 ]
+network_parameters_dict = {
+     512: (512,  128, 4.0),
+    1024: (1024, 256, 2.0),
+    2048: (2048, 512, 1.0),
+    4096: (4096, 1024, 0.5),
+    8192: (8192, 2048, 0.25)
+}
+
+
+# Obsolete
 
 synaptic_noise_amount_list = [0.0, 0.001, 0.01, 0.05, 0.1, 0.2, 0.5]
 
 
+# Obsolete
 # Collect data for three network sizes and 9 stimulus headings
 def explore_heading_angles():
     for i, network_param in enumerate(network_parameters):
@@ -141,6 +156,7 @@ def explore_heading_angles():
                        synaptic_noise_amount = 0.0
                       )
 
+# Obsolete
 # Collect data for three network sizes and different noise levels
 def explore_noise_levels():
     for i, network_param in enumerate(network_parameters):
@@ -156,16 +172,75 @@ def explore_noise_levels():
                        synaptic_noise_amount = synaptic_noise_amount
                       )
 
+# Collect data for different network sizes, noise levels, and stimulus headings
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, filename):
+    for i, Ne in enumerate(N_excitatory_neurons_list):
+        for stim_heading_degrees in stim_heading_degrees_list:
+            for synaptic_noise_amount in synaptic_noise_amount_list:
+                print('Trials with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
+                        Ne, 
+                        stim_heading_degrees, 
+                        synaptic_noise_amount))
+                network_param = network_parameters_dict.get(Ne)
+                if network_param is None:
+                    print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
+                else:
+                    run_trials(num_of_trials         = N_trials, 
+                               collected_data_file   = filename, 
+                               stimulus_center_deg   = stim_heading_degrees,
+                               N_excitatory          = network_param[0],
+                               N_inhibitory          = network_param[1],
+                               weight_scaling_factor = network_param[2],
+                               sim_time_duration     = 10000. * ms,
+                               synaptic_noise_amount = synaptic_noise_amount
+                              )
 
+
+    
 
 # Main program
-if len(sys.argv) < 2 or str(sys.argv[0]) == 'explore=everything':
-    explore_heading_angles()
-    explore_noise_levels()
-elif str(sys.argv[1]) == 'explore=angles':
-    explore_heading_angles()
-elif str(sys.argv[1]) == 'explore=noise':
-    explore_noise_levels()
-else:
-    print('Error: Unknown command line argument given. ARG: {}'.format(sys.argv))
 
+#if len(sys.argv) < 2 or str(sys.argv[0]) == 'explore=everything':
+#    explore_heading_angles()
+#    explore_noise_levels()
+#elif str(sys.argv[1]) == 'explore=angles':
+#    explore_heading_angles()
+#elif str(sys.argv[1]) == 'explore=noise':
+#    explore_noise_levels()
+#else:
+#    print('Error: Unknown command line argument given. ARG: {}'.format(sys.argv))
+
+
+# New command line options set up
+parser = argparse.ArgumentParser(description='Run the ring attractor simulation and collect data.')
+# Expect the number of excitatory neurons to use
+parser.add_argument('-N', '--neurons_num_exc', type=int, nargs='+', dest='neurons_num_exc', required=True, 
+                   help='One or more integers specifying the number of excitatory neurons in the network. Simulations will be run for each of these sizes.')
+# Expect the amount of synaptic noise to use
+parser.add_argument('--weight_noise_SNR', type=float, nargs='+', dest='weight_noise_SNR', default=[0], 
+                   help='One or more real numbers specifying the amount of synaptic weight noise (as SNR ratio) to use.')
+# Expect the stimulus heading to use
+parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[180], 
+                   help='One or more integer numbers specifying the stimulus heading to use.')
+# How many trials to run for each condition
+parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 
+                   help='Number of simulations to run and collect results. Default 20 trials.')
+# File to append collected results to
+parser.add_argument('-f', '--file', type=str, nargs=1, dest='filename', required=True, 
+                   help='Filename to append collected results to.')
+
+# Parse the command line arguments
+args = parser.parse_args()
+
+N_neurons_exc_list = args.neurons_num_exc
+weight_noise_SNR_list = args.weight_noise_SNR
+headings_list = args.headings
+N_trials = args.trials
+filename = args.filename
+
+# Run trials
+explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list, 
+                    synaptic_noise_amount_list=weight_noise_SNR_list, 
+                    stim_heading_degrees_list = headings_list, 
+                    N_trials = N_trials,
+                    filename = filename)
