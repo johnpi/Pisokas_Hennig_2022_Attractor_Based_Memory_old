@@ -177,23 +177,25 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
-                print('Trials with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
-                        Ne, 
-                        stim_heading_degrees, 
-                        synaptic_noise_amount))
-                network_param = network_parameters_dict.get(Ne)
-                if network_param is None:
-                    print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
-                else:
-                    run_trials(num_of_trials         = N_trials, 
-                               collected_data_file   = filename, 
-                               stimulus_center_deg   = stim_heading_degrees,
-                               N_excitatory          = network_param[0],
-                               N_inhibitory          = network_param[1],
-                               weight_scaling_factor = network_param[2],
-                               sim_time_duration     = 10000. * ms,
-                               synaptic_noise_amount = synaptic_noise_amount
-                              )
+                for trial in range(1, N_trials+1):
+                    print('Trial {:3} with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
+                            trial, 
+                            Ne, 
+                            stim_heading_degrees, 
+                            synaptic_noise_amount))
+                    network_param = network_parameters_dict.get(Ne)
+                    if network_param is None:
+                        print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
+                    else:
+                        run_trials(num_of_trials         = 1, 
+                                   collected_data_file   = filename, 
+                                   stimulus_center_deg   = stim_heading_degrees,
+                                   N_excitatory          = network_param[0],
+                                   N_inhibitory          = network_param[1],
+                                   weight_scaling_factor = network_param[2],
+                                   sim_time_duration     = 10000. * ms,
+                                   synaptic_noise_amount = synaptic_noise_amount
+                                  )
 
 
     

@@ -5,6 +5,7 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 
 # Load libraries
 import numpy as np
+from scipy import interpolate
 from brian2 import *
 
 
@@ -44,13 +45,117 @@ def get_spike_count(spike_monitor, spike_index_list, t_min, t_max):
     
     return spike_count_list
 
+
+def get_spike_rates(spike_monitor, spike_index_list, t_snapshots, t_window_width):
+    """ 
+        Returns : An array of spike rates one per recorded neuron in the spike_monitor
+    """
+    spike_counts_list = []
+    for t_snap in t_snapshots:
+        t_min = t_snap - t_window_width/2
+        t_max = t_snap + t_window_width/2
+        spike_counts = get_spike_count(spike_monitor, spike_index_list, t_min, t_max)
+        spike_counts_list.append(spike_counts)
+    
+    # Turn it into a matrix with first index indexing neuron number
+    spike_rates_array = np.array(spike_counts_list).T / t_window_width
+
+    return spike_rates_array
+
+
+def get_full_width_at_half_maximum(values_array, circular=False, value_range=None):
+    """
+        Gets an 1D array of values.
+        Returns a scalar value of the Full Width at Half Maximum of the array values.
+        Returns FWHM = inf in case that there is no peak.
+        If circular==False it returns  FWHM = inf if the peak is on the one end of the array.
+        If circular==True and there are only two 0 crossings it attempts to return 
+        a valid width even if the peak crosses the edges of the array.
+        If circular==True and there is only one 0 crossing it assumes distribution symmetry 
+        and just doubles the width. This must be very innacurate. 
+        
+        Returns width as number of elements between 0 crossings as a real number. If the option  
+        value_range is given then the FWHM is scaled to that range, eg 360deg.
+        
+        Needs more testing and improvements. Testing values:
+        values_array = np.array([[0,0,0,0.7,1,0.7,0,0,0],[0,0.7,1,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0.5],[1,0.3,0,0,0,0,0,0,0.3]])[2]
+        phase = 2*np.pi/8 # +4 # 0 # 1 # np.pi/2-3
+        values_array = np.sin(np.linspace(-np.pi, np.pi, 8)+phase)+1
+        circular = True
+        It seems to be working for real simulation data.
+    """
+    peak_idx = np.argmax(values_array) # get the index of the first max value
+    max_v = np.max(values_array)       # max value in the array
+    min_v = np.min(values_array)       # min value in the array
+    peak_v = values_array[peak_idx]    # signal value at the peak
+    half_v = (max_v - min_v) / 2       # half of the peak to peak value of the signal
+    
+    # We want to find the x axis width
+    # Shift signal values so that at half maximum the values are 0
+    values_array_shifted = values_array - half_v
+    # Fit a function to the data damples in order to precisely find 0 crossing points along the x axis
+    fitted_curve = interpolate.UnivariateSpline(range(len(values_array)), values_array_shifted, s=0)
+    roots = fitted_curve.roots() # get the x axis points where the function crosses y=0
+    # Get the nearest y=0 crossing points at the left and right of the peak
+    diffs = roots - peak_idx
+    
+    # If the array represents elements on a circle
+    if circular:
+        # If only two 0 crossings and both on the same side of the peak try to correct for wrap
+        if  len(diffs) == 2 and diffs[0] * diffs[1] > 0:
+            max_i = np.argmax(np.abs(diffs)) # Which of the two differences is furthest away from the peak
+            if max_i == 0: # In this case both 0 crossings are on the left of the peak
+                diffs[max_i] =   len(values_array)-1 - peak_idx + roots[0] # Wrap the leftmost 0 crossing
+            if max_i == 1: # In this case both 0 crossings are on the right of the peak
+                diffs[max_i] = -(len(values_array)-1 + peak_idx - roots[1]) # Wrap the rightmost 0 crossing
+        # This is an unrealistic situation where the peak is on the one end of the array only
+        if len(diffs) == 1:
+            diffs = np.append(diffs, -diffs[0]) # Assume symmetry
+
+    nearest_crossing_on_left = np.max(diffs[diffs<=0], initial=-inf)
+    nearest_crossing_on_right = np.min(diffs[diffs>=0], initial=inf)
+    # The distances of nearest crossing around the peak give us the FWHM
+    FWHM = nearest_crossing_on_right - nearest_crossing_on_left
+    
+    # Convert to a number scaled to the range of values
+    if value_range is not None:
+        FWHM = FWHM / len(values_array) * value_range
+    
+    return FWHM
+
+
+def get_full_width_at_half_maximum_ts(values_array_of_arrays, circular=False, value_range=None):
+    FWHM_list = []
+    for i, values_array in enumerate(values_array_of_arrays):
+        FWHM = get_full_width_at_half_maximum(values_array, circular, value_range)
+        FWHM_list.append(FWHM)
+    
+    return np.array(FWHM_list)
+
+def get_peak_ts(values_array_of_arrays):
+    peak_list = []
+    for i, values_array in enumerate(values_array_of_arrays):
+        peak = np.max(values_array)
+        peak_list.append(peak)
+    
+    return np.array(peak_list)
+
+def get_low_ts(values_array_of_arrays):
+    peak_list = []
+    for i, values_array in enumerate(values_array_of_arrays):
+        peak = np.min(values_array)
+        peak_list.append(peak)
+    
+    return np.array(peak_list)
+
+
 def add_vectors(vectors_list, polar_or_cartesian='polar', angles_in='rads'):
     """
         Adds a list of vectors and returns the total vector. Receives a list of 
         vector tupples or lists in polar or cartesian coordinates and returns 
         the vector addition of all of them. 
         
-        vectors_list : a list of vector tupples or lists in polar or cartesian coordinates.
+        vectors_list : a list of vector tupples or lists in polar (r, th) or cartesian (x, y) coordinates.
         polar_or_cartesian : 'polar' or 'cartesian' specifies the coordinate system used.
         angles_in          : 'rads' or 'degrees' specifies how the angular values should be interpreted.
         Returns : A tupple (x_total, y_total, r_total, theta_total)
@@ -101,9 +206,10 @@ def get_theta_time_series_vec_add(spike_monitor, idx_monitored_neurons, total_nu
         This implementation is more accurate. It uses the add_vectors() function to 
         add the constituent vectors in order to derive the population coded vector. 
     """
-    theta_angles = get_orientation(idx_monitored_neurons, total_num_of_neurons)
+    theta_angles = get_orientation(range(0, total_num_of_neurons), total_num_of_neurons)
     theta_angles = np.array(theta_angles)
     theta_time_series = []
+    r_time_series = []
     for t_snap in t_snapshots:
         t_min = t_snap - t_window_width/2
         t_max = t_snap + t_window_width/2
@@ -116,15 +222,38 @@ def get_theta_time_series_vec_add(spike_monitor, idx_monitored_neurons, total_nu
                                                              angles_in='degrees')
         
         theta_time_series.append(theta_total)
+        r_time_series.append(r_total)
 
-    return theta_time_series
+    return (r_time_series, theta_time_series)
+
+def get_theta_time_series_vec_add_from_array(np_array, idx_monitored_neurons, total_num_of_neurons):
+    """ 
+        This implementation is more accurate. It uses the add_vectors() function to 
+        add the constituent vectors in order to derive the population coded vector. 
+    """
+    theta_angles = get_orientation(range(0, total_num_of_neurons), total_num_of_neurons)
+    theta_angles = np.array(theta_angles)
+    theta_time_series = []
+    r_time_series = []
+    for spike_rates_ndarray in np_array.T:
+        polar_vectors_list = list(zip(spike_rates_ndarray[idx_monitored_neurons], theta_angles))
+        x_total, y_total, r_total, theta_total = add_vectors(polar_vectors_list, 
+                                                             polar_or_cartesian='polar', 
+                                                             angles_in='degrees')
+        
+        theta_time_series.append(theta_total)
+        r_time_series.append(r_total)
+
+    return (np.array(r_time_series), np.array(theta_time_series))
+
+
 
 def get_theta_time_series(spike_monitor, idx_monitored_neurons, total_num_of_neurons, t_snapshots, t_window_width):
     """
         This implementation is the typical population activity weighted vector. It is 
         inaccurate near 0deg as well as when there is noise in the population activity. 
     """
-    theta_angles = get_orientation(idx_monitored_neurons, total_num_of_neurons)
+    theta_angles = get_orientation(range(0, total_num_of_neurons), total_num_of_neurons)
     theta_angles = np.array(theta_angles)
     theta_time_series = []
     for t_snap in t_snapshots:
@@ -146,8 +275,33 @@ def check_value(record, key, expected_value):
         Returns True if the dictionary record contains a key 
         named 'key' with value equal to expected_value.
     """
-    if key in record and record[key] == expected_value:
+    #print('COMPARE: {} == {}'.format(record[key], expected_value))
+    #print('TYPEOF: {} == {}'.format(type(record[key]), type(expected_value)))
+
+    if key in record and np.all(record[key] == expected_value):
         return True
+    # This is to support the new format of data files that store the stimuli in 
+    # a dict of dicts to allow for multiple stimuli. So the initialisation stimulus 
+    # details would be stored in a dict in record['stim_setups_dict']['selectedColumnsBool']
+    # with key 'stim_neuron_list' holding the array of stimulated neurons. 
+    elif key == 'stim_neuron_list' and 'stim_setups_dict' in record and 'selectedColumnsBool' in record['stim_setups_dict'] and  np.all(record['stim_setups_dict']['selectedColumnsBool'].get('stim_neuron_list') == expected_value):
+        return True
+    # This is to support the new format of data files that store the stimuli in 
+    # a dict of dicts to allow for multiple stimuli. So the initialisation stimulus 
+    # details would be stored in a dict in record['stim_setups_dict']['vonMisesFixedBool']
+    # with key 'stim_neuron_list' holding the array of stimulated neurons. 
+    elif key == 'stim_neuron_list' and 'stim_setups_dict' in record and 'vonMisesFixedBool' in record['stim_setups_dict'] and  np.all(record['stim_setups_dict']['vonMisesFixedBool'].get('stim_neuron_list') == expected_value):
+        return True
+    elif '.' in key:
+        # If the key is actually representing dict key hierarchy, with keys separated by . do this
+        keys_list = key.split('.')
+        if len(keys_list) == 3:
+            key_level_0 = keys_list[0]
+            key_level_1 = keys_list[1]
+            key_level_2 = keys_list[2]
+            if key_level_0 in record and key_level_1 in record[key_level_0] and key_level_2 in record[key_level_0][key_level_1] and np.all(record[key_level_0][key_level_1][key_level_2] == expected_value):
+                return True
+    
     return False
 
 def select_records_from_list(dicts_list, selectors, operator):
@@ -185,6 +339,17 @@ def select_records_from_list(dicts_list, selectors, operator):
     # remove the records
     selected_data_items_and_op = [selected_data_items[i] for i, elem in enumerate(selected_data_items) if i not in items_to_remove_list]
     selected_data_items = selected_data_items_and_op
+    
+    return selected_data_items
+
+def pick_records_from_file(collected_data_file, selectors, operator):
+    # Try to load existing data if any otherwise create an empty collection
+    try:
+        collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
+    except: 
+        collected_trials_data = np.array([]) # Collected trials data records list
+
+    selected_data_items = select_records_from_list(collected_trials_data, selectors, operator)
     
     return selected_data_items
 
@@ -226,13 +391,7 @@ def pick_data_samples(collected_data_file,
     args['collected_data_file'] = None # Set to None so that it is ignored in the iterator later
     args['operator']            = None # Set to None so that it is ignored in the iterator later
     
-    # Try to load existing data if any otherwise create an empty collection
-    try:
-        collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
-    except: 
-        collected_trials_data = np.array([]) # Collected trials data records list
-
-    selected_data_items = select_records_from_list(collected_trials_data, args, operator)
+    selected_data_items = pick_records_from_file(collected_data_file, args, operator)
     
     return selected_data_items
 
@@ -378,3 +537,71 @@ def unwrap_modulo_time_series(data_time_series, modulo = 360):
     
     # Return recorstructed time series
     return dp_reconstruct
+
+
+import inspect
+class CX_Neuron_Data:
+    
+    def first_half_P_ENs(self):
+        # Plot first half P-ENs
+        neurons_from_id = int(0)
+        neurons_to_id   = int(self.n_P_EN / 2)
+        return (neurons_from_id, neurons_to_id)
+
+    def all_P_ENs(self):
+        # Plot all P-ENs
+        neurons_from_id = int(0)
+        neurons_to_id   = int(self.n_P_EN)
+        return (neurons_from_id, neurons_to_id)
+
+    def first_half_P_EGs(self):
+        # Plot first half P-EGs
+        neurons_from_id = int(self.n_P_EN)
+        neurons_to_id   = int(self.n_P_EN + self.n_P_EG / 2)
+        return (neurons_from_id, neurons_to_id)
+
+    def all_P_EGs(self):
+        # Plot all P-EGs
+        neurons_from_id = int(self.n_P_EN)
+        neurons_to_id   = int(self.n_P_EN + self.n_P_EG)
+        return (neurons_from_id, neurons_to_id)
+
+    def first_half_E_PGs(self):
+        # Plot first half E-PGs
+        neurons_from_id = int(self.n_P_EN + self.n_P_EG)
+        neurons_to_id   = int(self.n_P_EN + self.n_P_EG + self.n_E_PG / 2)
+        return (neurons_from_id, neurons_to_id)
+
+    def all_E_PGs(self):
+        # Plot all E-PGs
+        neurons_from_id = int(self.n_P_EN + self.n_P_EG)
+        neurons_to_id   = int(self.n_P_EN + self.n_P_EG + self.n_E_PG)
+        return (neurons_from_id, neurons_to_id)
+
+    def all_Pintrs(self):
+        # Plot all Pintrs
+        neurons_from_id = int(self.n_P_EN + self.n_P_EG + self.n_E_PG)
+        neurons_to_id   = int(self.n_P_EN + self.n_P_EG + self.n_E_PG + self.n_Pintr)
+        return (neurons_from_id, neurons_to_id)
+
+
+    def get_available_neuron_subsets(self):
+        methods_of_object = inspect.getmembers(self, predicate=inspect.ismethod)
+        methods_of_object,_ = zip(*methods_of_object)
+        methods_of_object = set(methods_of_object)
+        methods_of_object.remove('get_available_neuron_subsets')
+        methods_of_object.remove('get_neuron_subset_IDs')
+        methods_of_object.remove('first_half_P_ENs')
+        methods_of_object.remove('__init__')
+        return methods_of_object
+
+    def get_neuron_subset_IDs(self, plot_group_name):
+        #(neurons_from_id, neurons_to_id) = self.options.get(plot_group_name)()
+        (neurons_from_id, neurons_to_id) = getattr(self, plot_group_name)()
+        return (neurons_from_id, neurons_to_id)
+
+    def __init__(self, value_dic):
+        self.n_P_EN  = value_dic['n_P_EN']
+        self.n_P_EG  = value_dic['n_P_EG']
+        self.n_E_PG  = value_dic['n_E_PG']
+        self.n_Pintr = value_dic['n_Pintr']
