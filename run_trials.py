@@ -228,7 +228,7 @@ parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[
 parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 
                    help='Number of simulations to run and collect results. Default 20 trials.')
 # File to append collected results to
-parser.add_argument('-f', '--file', type=str, nargs=1, dest='filename', required=True, 
+parser.add_argument('-f', '--file', type=str, dest='filename', required=True, 
                    help='Filename to append collected results to.')
 
 # Parse the command line arguments
