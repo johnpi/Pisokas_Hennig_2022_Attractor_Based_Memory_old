@@ -70,7 +70,14 @@ def correct_file(collected_data_file,
         
         print('Checking validity ', t_snapshots.shape[0], ' != ', len(theta_ts))
         if t_snapshots.shape[0] != len(theta_ts):
-            theta_ts = get_theta_time_series_vec_add(spike_monitor_excit_spike_trains, idx_monitored_neurons_excit, N_excitatory, t_snapshots, t_window_width)
+            theta_ts = get_theta_time_series_vec_add(spike_monitor_excit_spike_trains, 
+                                                     idx_monitored_neurons_excit, 
+                                                     len(idx_monitored_neurons_excit), # Instead of N_excitatory because
+                                                                                       # wm_model_modified.simulate_wm returns 
+                                                                                       # in idx_monitored_neurons_excit at most 
+                                                                                       # 1024 neurons 
+                                                     t_snapshots, 
+                                                     t_window_width)
 
         item['t_window_width']    = t_window_width
         item['snapshot_interval'] = snapshot_interval

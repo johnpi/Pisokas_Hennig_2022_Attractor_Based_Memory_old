@@ -76,7 +76,14 @@ def run_trials(num_of_trials         = 20,
             )*ms
         
         # Calculate the population vector angle theta
-        theta_ts = get_theta_time_series_vec_add(spike_monitor_excit, idx_monitored_neurons_excit, N_excitatory, t_snapshots, t_window_width)
+        theta_ts = get_theta_time_series_vec_add(spike_monitor_excit, 
+                                                 idx_monitored_neurons_excit, 
+                                                 len(idx_monitored_neurons_excit), # Instead of N_excitatory because
+                                                                                   # wm_model_modified.simulate_wm returns 
+                                                                                   # in idx_monitored_neurons_excit at most 
+                                                                                   # 1024 neurons 
+                                                 t_snapshots, 
+                                                 t_window_width)
 
         # Create a new dictionary with the collected data
         collected_data = dict()
