@@ -33,11 +33,18 @@ python -m pip install --upgrade --user --no-binary :all: Cython      && \
 python -m pip install --upgrade --user --no-binary :all: nose        && \
 python -m pip install --upgrade --user --no-binary :all: brian2      && \
 python -m pip install --upgrade --user --no-binary :all: brian2tools && \
-echo "Brian2 was installed successfully."
+[ $? -eq 0 ] && echo "Brian2 was installed successfully." || echo "Brian2 or its requirements were not installed."
+
+echo
+echo "Installing SK Learn..."
+python -m pip install --upgrade --user --no-binary :all: sklearn && \
+[ $? -eq 0 ] && echo "SK Learn was installed successfully." || echo "SK Learn or its requirements were not installed."
 
 echo 
 echo "Installing extras: Jupyter notebooks"
 python -m pip install --upgrade --user --no-binary :all: jupyter
+[ $? -eq 0 ] && echo "Jupyter notebooks was installed successfully." || echo "Jupyter notebooks or its requirements were not installed."
+
 
 echo 
 echo "To test the installation of Brian2 I run"
