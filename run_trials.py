@@ -185,7 +185,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -205,7 +205,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
                                    N_excitatory          = network_param[0],
                                    N_inhibitory          = network_param[1],
                                    weight_scaling_factor = network_param[2],
-                                   sim_time_duration     = 10000. * ms,
+                                   sim_time_duration     = sim_time_duration,
                                    synaptic_noise_amount = synaptic_noise_amount
                                   )
 
@@ -239,6 +239,9 @@ parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[
 # How many trials to run for each condition
 parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 
                    help='Number of simulations to run and collect results. Default 20 trials.')
+# How many seconds to run the simulation for
+parser.add_argument('-D', '--duration', type=int, dest='duration', default=10, 
+                   help='Number of of seconds to run the simulations of the network. Default 10 seconds.')
 # File to append collected results to
 parser.add_argument('-f', '--file', type=str, dest='filename', required=True, 
                    help='Filename to append collected results to.')
@@ -250,6 +253,7 @@ N_neurons_exc_list = args.neurons_num_exc
 weight_noise_SNR_list = args.weight_noise_SNR
 headings_list = args.headings
 N_trials = args.trials
+duration = args.duration
 filename = args.filename
 
 # Run trials
@@ -257,4 +261,5 @@ explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list,
                     synaptic_noise_amount_list=weight_noise_SNR_list, 
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
+                    sim_time_duration = duration * 1000. * ms, 
                     filename = filename)

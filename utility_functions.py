@@ -431,10 +431,6 @@ def mean_absolute_deviation(expected_value, time_series_list):
     return abs_diff_mean
 
 
-
-
-
-
 # Experimental and untested
 
 def add_gaussian_white_noise_by_variance(data, variance):
