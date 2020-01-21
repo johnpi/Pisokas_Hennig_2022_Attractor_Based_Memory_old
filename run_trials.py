@@ -9,7 +9,7 @@ import argparse # For command line argument parsing
 
 import numpy as np
 from brian2 import *
-from neurodynex.working_memory_network import wm_model
+#from neurodynex.working_memory_network import wm_model
 from neurodynex.working_memory_network import wm_model_modified
 
 from utility_functions import *
@@ -67,7 +67,24 @@ def run_trials(num_of_trials         = 20,
 
     for iteration in range(num_of_trials):
         print('Trial: ', iteration+1)
-        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount)
+        # Keeping monitors of activity requires a lot of RAM. 
+        # This tries to use settings that can be accommodated by available RAM.
+        # Tests revealed that on a computer with 32GB RAM we could simulate a 
+        # network with N_excitatory=1024 for 60s without out of memory crash.
+        # We use this information to estimate memory demand and choose how 
+        # many neurons to monitor. 
+        RAM_available = 32000000000 # 32GB available RAM
+        N_exc_num = 1024            # [Neurons] tested with 1024 neurons
+        max_sim_duration = 60       # [sec]     tested and found max simulated time that can fit in this RAM memory
+        RAM_per_sim_sec = RAM_available / max_sim_duration # [Bytes/s]
+        k = RAM_per_sim_sec / N_exc_num                    # [Bytes/s/neuron]
+        monitored_subset_size = N_excitatory               # [Neurons] Default is to monitor all neurons
+        RAM_ps = monitored_subset_size * k                 # [Bytes/s]
+        RAM_total = RAM_ps * sim_time_duration             # [Bytes]
+        if RAMtotal > RAM_available:
+            mon_neurons_factor = RAM_available / RAM_total
+            monitored_subset_size = int(monitored_subset_size * mon_neurons_factor)
+        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size)
         
         t_snapshots = range(
             int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
