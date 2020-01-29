@@ -11,16 +11,20 @@ from utility_functions import *
 
 # List of input files to read data from
 collected_data_files_list = [
-    'Data/collected_drift_trials.npy',
-    'Data/collected_drift_trials_v2_angles.npy',
-    'Data/collected_drift_trials_v2_noise.npy',
-    'Data/collected_drift_trials_v2_Ne512_noise.npy',
-    'Data/collected_drift_trials_v2_noise_Ne2048.npy',
-    'Data/collected_drift_trials_v2_Ne4096_noise.npy'
+#    'Data/collected_drift_trials.npy',
+#    'Data/collected_drift_trials_v2_angles.npy',
+#    'Data/collected_drift_trials_v2_noise.npy',
+#    'Data/collected_drift_trials_v2_Ne512_noise.npy',
+#    'Data/collected_drift_trials_v2_noise_Ne2048.npy',
+#    'Data/collected_drift_trials_v2_Ne4096_noise.npy'
+    'Data/collected_drift_trials_v3_all.npy',
+    'Data/collected_drift_trials_v4_all.npy',    
 ]
 
 # File to store all the data to
-merged_data_filename = 'Data/collected_drift_trials_v2_all.npy'
+#merged_data_filename = 'Data/collected_drift_trials_v2_all.npy'
+merged_data_filename = 'Data/collected_drift_trials_v3and4_all.npy'
+
 
 
 def merge_file(collected_data_files_list, merged_data_filename):

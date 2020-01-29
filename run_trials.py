@@ -81,7 +81,7 @@ def run_trials(num_of_trials         = 20,
         monitored_subset_size = N_excitatory               # [Neurons] Default is to monitor all neurons
         RAM_ps = monitored_subset_size * k                 # [Bytes/s]
         RAM_total = RAM_ps * sim_time_duration             # [Bytes]
-        if int(RAM_total) > RAM_available:
+        if int(RAM_total) > RAM_available:                 # The int() is for removing the units
             mon_neurons_factor = RAM_available / RAM_total
             monitored_subset_size = int(monitored_subset_size * mon_neurons_factor)
         rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size)
