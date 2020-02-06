@@ -38,7 +38,7 @@ def run_trials(num_of_trials         = 20,
                J_excit2inhib    = 0.3 / 1000,
                J_ext2inhib   = 1.0,
                J_ext2excit   = 1.0, 
-               tau_excit     = 10.0*ms, # Default is 10.0 * ms,
+               tau_excit     = 20.0*ms, # Default is 20.0 * ms,
                tau_inhib     = 10.0*ms  # Default is 10.0 * ms
               ):
     """
@@ -270,7 +270,6 @@ parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[
 # Specify the time constant of the membrane tau=R*C
 parser.add_argument('--tau_m', type=int, nargs='+', dest='tau_m', default=[10], 
                    help='One or more integer numbers specifying the time constant of the membrane tau=R*C. The simulation will be run for each value given. Default is tau=10[ms]')
-
 # How many trials to run for each condition
 parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 
                    help='Number of simulations to run and collect results. Default 20 trials.')

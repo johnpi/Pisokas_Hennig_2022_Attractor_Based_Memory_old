@@ -28,9 +28,11 @@ def run_trials(num_of_trials         = 20,
                N_inhibitory          = 256,
                weight_scaling_factor = 2.0,
                sim_time_duration     = 10000. * ms,
-               t_window_width      = 200*ms,
-               snapshot_interval   = 100*ms,
-               synaptic_noise_amount = 0.0
+               t_window_width        = 200*ms,
+               snapshot_interval     = 100*ms,
+               synaptic_noise_amount = 0.0,
+               tau_excit             = 20.0*ms, # Default is 20.0 * ms,
+               tau_inhib             = 10.0*ms  # Default is 10.0 * ms
               ):
     """
         Runs trials of the activity bump drift and collects corresponding time series
@@ -114,6 +116,8 @@ def run_trials(num_of_trials         = 20,
         collected_data['N_inhibitory'] = N_inhibitory
         collected_data['weight_scaling_factor'] = weight_scaling_factor
         collected_data['synaptic_noise_amount'] = synaptic_noise_amount
+        collected_data['tau_excit'] = tau_excit
+        collected_data['tau_inhib'] = tau_inhib
 
         # Data
         #collected_data['rate_monitor_excit'] = rate_monitor_excit
@@ -202,7 +206,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, tau_membrane_list, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -223,7 +227,9 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
                                    N_inhibitory          = network_param[1],
                                    weight_scaling_factor = network_param[2],
                                    sim_time_duration     = sim_time_duration,
-                                   synaptic_noise_amount = synaptic_noise_amount
+                                   synaptic_noise_amount = synaptic_noise_amount,
+                                   tau_excit             = tau_membrane * ms,
+                                   tau_inhib             = tau_membrane * ms / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
                                   )
 
 
@@ -253,6 +259,9 @@ parser.add_argument('--weight_noise_SNR', type=float, nargs='+', dest='weight_no
 # Expect the stimulus heading to use
 parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[180], 
                    help='One or more integer numbers specifying the stimulus heading to use.')
+# Specify the time constant of the membrane tau=R*C
+parser.add_argument('--tau_m', type=int, nargs='+', dest='tau_m', default=[10], 
+                   help='One or more integer numbers specifying the time constant of the membrane tau=R*C. The simulation will be run for each value given. Default is tau=10[ms]')
 # How many trials to run for each condition
 parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 
                    help='Number of simulations to run and collect results. Default 20 trials.')
@@ -271,6 +280,7 @@ weight_noise_SNR_list = args.weight_noise_SNR
 headings_list = args.headings
 N_trials = args.trials
 duration = args.duration
+tau_m    = args.tau_m
 filename = args.filename
 
 # Run trials
@@ -279,4 +289,5 @@ explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list,
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
                     sim_time_duration = duration * 1000. * ms, 
+                    tau_membrane_list = tau_m, 
                     filename = filename)

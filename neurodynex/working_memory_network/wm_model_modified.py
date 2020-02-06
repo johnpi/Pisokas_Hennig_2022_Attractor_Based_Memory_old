@@ -60,7 +60,9 @@ def simulate_wm(
         G_excit2excit=.35 * 0.381 * b2.nS,
         G_excit2inhib=.35 * 1.2 * 0.292 * b2.nS,
         monitored_subset_size=1024, sim_time=800. * b2.ms,
-        synaptic_noise_amount=0.0):
+        synaptic_noise_amount=0.0,
+        tau_excit     = None, # Default is 20.0 * b2.ms (tau_excit needs to be higher than tau_inhib for bump maintenance)
+        tau_inhib     = None  # Default is 10.0 * b2.ms):
     """
     Args:
         N_excitatory (int): Size of the excitatory population
@@ -115,7 +117,9 @@ def simulate_wm(
     v_firing_threshold_excit = -50.0 * b2.mV  # spike condition
     v_reset_excit = -60.0 * b2.mV  # reset voltage after spike
     t_abs_refract_excit = 2.0 * b2.ms  # absolute refractory period
-
+    
+    if tau_excit is not None:
+        G_leak_excit = Cm_excit / tau_excit
     # specify the weight profile in the recurrent population
     # std-dev of the gaussian weight profile around the prefered direction
     # sigma_weight_profile = 12.0  # std-dev of the gaussian weight profile around the prefered direction
@@ -130,7 +134,10 @@ def simulate_wm(
     v_firing_threshold_inhib = -50.0 * b2.mV
     v_reset_inhib = -60.0 * b2.mV
     t_abs_refract_inhib = 1.0 * b2.ms
-
+    
+    if tau_inhib is not None:
+        G_leak_inhib = Cm_inhib / tau_inhib
+    
     # specify the AMPA synapses
     E_AMPA = 0.0 * b2.mV
     tau_AMPA = .9 * 2.0 * b2.ms
