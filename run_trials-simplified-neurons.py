@@ -211,31 +211,32 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, tau_membrane, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, tau_membrane_list, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
-                for trial in range(1, N_trials+1):
-                    print('Trial {:3} with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
-                            trial, 
-                            Ne, 
-                            stim_heading_degrees, 
-                            synaptic_noise_amount))
-                    network_param = network_parameters_dict.get(Ne)
-                    if network_param is None:
-                        print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
-                    else:
-                        run_trials(num_of_trials         = 1, 
-                                   collected_data_file   = filename, 
-                                   stimulus_center_deg   = stim_heading_degrees,
-                                   N_excitatory          = network_param[0],
-                                   N_inhibitory          = network_param[1],
-                                   weight_scaling_factor = network_param[2],
-                                   sim_time_duration     = sim_time_duration,
-                                   synaptic_noise_amount = synaptic_noise_amount,
-                                   tau_excit             = tau_membrane,
-                                   tau_inhib             = tau_membrane / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
-                                  )
+                for tau_membrane in tau_membrane_list:
+                    for trial in range(1, N_trials+1):
+                        print('Trial {:3} with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
+                                trial, 
+                                Ne, 
+                                stim_heading_degrees, 
+                                synaptic_noise_amount))
+                        network_param = network_parameters_dict.get(Ne)
+                        if network_param is None:
+                            print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
+                        else:
+                            run_trials(num_of_trials         = 1, 
+                                       collected_data_file   = filename, 
+                                       stimulus_center_deg   = stim_heading_degrees,
+                                       N_excitatory          = network_param[0],
+                                       N_inhibitory          = network_param[1],
+                                       weight_scaling_factor = network_param[2],
+                                       sim_time_duration     = sim_time_duration,
+                                       synaptic_noise_amount = synaptic_noise_amount,
+                                       tau_excit             = tau_membrane * ms,
+                                       tau_inhib             = tau_membrane * ms / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
+                                      )
 
 
     
@@ -295,5 +296,5 @@ explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list,
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
                     sim_time_duration = duration * 1000. * ms, 
-                    tau_membrane = tau_m * ms, 
+                    tau_membrane_list = tau_m, 
                     filename = filename)
