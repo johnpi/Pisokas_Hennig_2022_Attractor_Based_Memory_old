@@ -62,7 +62,8 @@ def simulate_wm(
         monitored_subset_size=1024, sim_time=800. * b2.ms,
         synaptic_noise_amount=0.0,
         tau_excit     = None, # Default is 20.0 * b2.ms (tau_excit needs to be higher than tau_inhib for bump maintenance)
-        tau_inhib     = None  # Default is 10.0 * b2.ms):
+        tau_inhib     = None  # Default is 10.0 * b2.ms
+    ):
     """
     Args:
         N_excitatory (int): Size of the excitatory population
