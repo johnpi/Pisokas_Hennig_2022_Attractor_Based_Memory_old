@@ -123,6 +123,8 @@ def run_trials(num_of_trials         = 20,
         collected_data['N_inhibitory'] = N_inhibitory
         collected_data['weight_scaling_factor'] = weight_scaling_factor
         collected_data['synaptic_noise_amount'] = synaptic_noise_amount
+        collected_data['tau_excit'] = tau_excit
+        collected_data['tau_inhib'] = tau_inhib
 
         # Data
         #collected_data['rate_monitor_excit'] = rate_monitor_excit
