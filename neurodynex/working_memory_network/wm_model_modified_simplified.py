@@ -78,7 +78,7 @@ def simulate_wm_simple(
         J_excit2inhib    = 0.3 / 1000,
         J_ext2inhib   = 1.0, 
         J_ext2excit   = 1.0, 
-        tau_excit     = None, # Default is 20.0 * b2.ms,
+        tau_excit     = None, # Default is 20.0 * b2.ms (tau_excit needs to be higher than tau_inhib for bump maintenance)
         tau_inhib     = None  # Default is 10.0 * b2.ms
         ):
     

@@ -234,7 +234,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
                                    sim_time_duration     = sim_time_duration,
                                    synaptic_noise_amount = synaptic_noise_amount,
                                    tau_excit             = tau_membrane,
-                                   tau_inhib             = tau_membrane
+                                   tau_inhib             = tau_membrane / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
                                   )
 
 
