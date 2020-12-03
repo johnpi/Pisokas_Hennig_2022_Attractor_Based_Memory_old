@@ -71,7 +71,7 @@ def correct_file(collected_data_file,
         print('Checking validity ', t_snapshots.shape[0], ' != ', len(theta_ts))
         if  (isinstance(theta_ts, list)  and t_snapshots.shape[0] != len(theta_ts)) or 
             (isinstance(theta_ts, tuple) and t_snapshots.shape[0] != len(theta_ts[1])):
-            theta_ts = get_theta_time_series_vec_add(spike_monitor_excit_spike_trains, 
+            (r_ts, theta_ts) = get_theta_time_series_vec_add(spike_monitor_excit_spike_trains, 
                                                      idx_monitored_neurons_excit, 
                                                      len(idx_monitored_neurons_excit), # Instead of N_excitatory because
                                                                                        # wm_model_modified.simulate_wm returns 

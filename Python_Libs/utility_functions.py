@@ -603,3 +603,4 @@ class CX_Neuron_Data:
         self.n_P_EG  = value_dic['n_P_EG']
         self.n_E_PG  = value_dic['n_E_PG']
         self.n_Pintr = value_dic['n_Pintr']
+
