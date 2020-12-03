@@ -8,7 +8,7 @@
 # Grid Engine options (lines prefixed with #$)
 #$ -N run_trials_job
 #$ -cwd
-#$ -l h_vmem=128G
+#$ -l h_vmem=32G
 #  These options are:
 #  job name: -N
 #  use the current working directory: -cwd
