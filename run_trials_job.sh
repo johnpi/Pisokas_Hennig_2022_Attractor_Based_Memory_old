@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #  run_trials_job.sh
 #  
@@ -8,7 +8,7 @@
 # Grid Engine options (lines prefixed with #$)
 #$ -N run_trials_job
 #$ -cwd
-#$ -l h_vmem=32G
+#$ -l h_vmem=64G
 #  These options are:
 #  job name: -N
 #  use the current working directory: -cwd
@@ -18,6 +18,8 @@
 
 # Initialise the environment modules
 . /etc/profile.d/modules.sh
+
+source ~/.bashrc
 
 # Load Python
 module load anaconda/5.3.1
