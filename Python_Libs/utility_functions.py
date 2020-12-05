@@ -432,6 +432,39 @@ def mean_absolute_deviation(expected_value, time_series_list):
     
     return abs_diff_mean
 
+def median_absolute_deviation(expected_value, time_series_list):
+    """
+        Returns the median absolute deviation (MAD) of time series produced
+        by multiple trials at each point in time. That is a measure of
+        dispersion over time.
+        $MAD = \frac{1}{N} \sum_{i=0}^{N} \abs{x_{i} - median(X)}$
+        MAD is a better measure than standard deviation (SD).
+        
+        expected_value   : The expected value for MAD normally is the median of
+                           the sample. That is the median value of all time series
+                           at that point in time. However you can provide
+                           any expected value here.
+        time_series_list : A list or np.array containing np.arrays of several
+                           time series. All time series must have the same
+                           number of items.
+        Returns          : A time series with elements the MAD at each point in
+                           time. It has the same number of items as the contained
+                           time series.
+    """
+
+    # The absolute value of the differences of the time series samples from the expected value
+
+    abs_diff_list = []
+    # Get the absolute deviation of each item of the series from the expected value
+    for ts in time_series_list:
+        abs_diff = np.abs(np.ones(len(ts)) * expected_value - ts)
+        abs_diff_list.append(abs_diff)
+
+    # Get the median absolute deviation across all time series at each point in time
+    abs_diff_median = np.median(abs_diff_list, axis=0)
+
+    return abs_diff_median
+
 
 # Experimental and untested
 
@@ -603,4 +636,3 @@ class CX_Neuron_Data:
         self.n_P_EG  = value_dic['n_P_EG']
         self.n_E_PG  = value_dic['n_E_PG']
         self.n_Pintr = value_dic['n_Pintr']
-
