@@ -9,11 +9,12 @@
 #$ -N run_trials_job
 #$ -cwd
 #$ -l h_vmem=32G
+#$ -l h_rt=972:00:00
 #  These options are:
 #  job name: -N
 #  use the current working directory: -cwd
-## $ -l h_rt=96:00:00
-#  runtime limit of 96 hours: -l h_rt
+## $ -l h_rt=72:00:00
+#  runtime limit of 72 hours: -l h_rt
 #  memory limit of 128 Gbyte: -l h_vmem
 
 # Initialise the environment modules
