@@ -84,6 +84,7 @@ def run_trials(num_of_trials         = 20,
         # We use this information to estimate memory demand and choose how 
         # many neurons to monitor. 
         RAM_available = 32000000000 # 32GB available RAM
+        RAM_available = 16000000000 # 32GB available RAM
         N_exc_num = 1024            # [Neurons] tested with 1024 neurons
         max_sim_duration = 60       # [sec]     tested and found max simulated time that can fit in this RAM memory
         RAM_per_sim_sec = RAM_available / max_sim_duration # [Bytes/s]
