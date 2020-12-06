@@ -8,7 +8,7 @@
 # Grid Engine options (lines prefixed with #$)
 #$ -N run_trials_job
 #$ -cwd
-#$ -l h_vmem=16G
+#$ -l h_vmem=20G
 ## $ -l h_rt=48:00:00
 #  These options are:
 #  job name: -N
