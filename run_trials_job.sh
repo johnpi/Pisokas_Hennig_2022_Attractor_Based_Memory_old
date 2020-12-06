@@ -17,6 +17,8 @@
 #  runtime limit of 72 hours: -l h_rt
 #  memory limit of 128 Gbyte: -l h_vmem
 
+ vmem=16000000000 # In Bytes
+ 
 # Initialise the environment modules
 . /etc/profile.d/modules.sh
 
@@ -34,11 +36,11 @@ conda activate Brian2
 # Run the program
 if [ "${1}" == "reduced" ]; then
    echo	"Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N $2 -t $4 -D $3 -f Data/collected_drift_trials_all_EC_LV_reduced_2_duration300s_veddie01_$2.npy"
-   python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N "$2" -t "$4" -D "$3" -f "Data/collected_drift_trials_all_EC_LV_reduced_2_duration300s_veddie01_$2.npy"
+   python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N "$2" -t "$4" -D "$3" -a "${vmem}" -f "Data/collected_drift_trials_all_EC_LV_reduced_2_duration300s_veddie01_$2.npy"
 fi
 
 if [ "${1}" == "full" ]; then
    echo	"Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N $2 -t $4 -D $3 -f Data/collected_drift_trials_all_EC_LV_duration300s_veddie01_$2.npy"
-   python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N "$2" -t "$4" -D "$3" -f "Data/collected_drift_trials_all_EC_LV_duration300s_veddie01_$2.npy"
+   python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N "$2" -t "$4" -D "$3" -a "${vmem}" -f "Data/collected_drift_trials_all_EC_LV_duration300s_veddie01_$2.npy"
 fi
 
