@@ -24,6 +24,7 @@ def run_trials(num_of_trials         = 20,
                stimulus_strength     = 2.0 * namp, # 0.5 * namp,
                t_stimulus_start      = 100 * ms,
                t_stimulus_duration   = 200 * ms,
+               available_RAM         = 32e9,
                N_excitatory          = 1024,
                N_inhibitory          = 256,
                weight_scaling_factor = 2.0,
@@ -86,6 +87,7 @@ def run_trials(num_of_trials         = 20,
         RAM_tested    = 32000000000 # 32GB available RAM was tested
         RAM_available = 32000000000 # 32GB available RAM
         RAM_available = 16000000000 # 32GB available RAM
+        RAM_available = available_RAM
         N_exc_num = 1024            # [Neurons] tested with 1024 neurons
         max_sim_duration = 60       # [sec]     tested and found max simulated time that can fit in this RAM memory
         # How much memory the test used per s per neuron
@@ -230,7 +232,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, available_RAM, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -271,7 +273,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
 
                                        G_extern2excit        = G_extern2excit * nS,
                                        stimulus_strength     = stimulus_strength * namp,
-                                       
+                                       available_RAM = available_RAM,
                                        poisson_firing_rate   = 2.3 * Hz
                                       )
                         else:
@@ -310,6 +312,9 @@ parser.add_argument('-t', '--trials', type=int, dest='trials', default=20,
 # How many seconds to run the simulation for
 parser.add_argument('-D', '--duration', type=int, dest='duration', default=10, 
                    help='Number of of seconds to run the simulations of the network. Default 10 seconds.')
+# How much available RAM there is for the process to use
+parser.add_argument('-a', '--available-RAM', type=int, dest='available_RAM', default=32e9,
+                   help='Amound of available RAM for the simulation in Bytes.')
 # File to append collected results to
 parser.add_argument('-f', '--file', type=str, dest='filename', required=True, 
                    help='Filename to append collected results to.')
@@ -323,11 +328,13 @@ headings_list = args.headings
 N_trials = args.trials
 duration = args.duration
 filename = args.filename
+available_RAM = args.available_RAM
 
 # Run trials
 explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list, 
                     synaptic_noise_amount_list=weight_noise_SNR_list, 
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
-                    sim_time_duration = duration * 1000. * ms, 
+                    sim_time_duration = duration * 1000. * ms,
+                    available_RAM = available_RAM,
                     filename = filename)
