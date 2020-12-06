@@ -83,13 +83,16 @@ def run_trials(num_of_trials         = 20,
         # network with N_excitatory=1024 for 60s without out of memory crash.
         # We use this information to estimate memory demand and choose how 
         # many neurons to monitor. 
+        RAM_tested    = 32000000000 # 32GB available RAM was tested
         RAM_available = 32000000000 # 32GB available RAM
         RAM_available = 16000000000 # 32GB available RAM
         N_exc_num = 1024            # [Neurons] tested with 1024 neurons
         max_sim_duration = 60       # [sec]     tested and found max simulated time that can fit in this RAM memory
-        RAM_per_sim_sec = RAM_available / max_sim_duration # [Bytes/s]
+        # How much memory the test used per s per neuron
+        RAM_per_sim_sec = RAM_tested / max_sim_duration # [Bytes/s]
         k = RAM_per_sim_sec / N_exc_num                    # [Bytes/s/neuron]
         monitored_subset_size = N_excitatory               # [Neurons] Default is to monitor all neurons
+        # How much memory we will need for this simulation
         RAM_ps = monitored_subset_size * k                 # [Bytes/s]
         RAM_total = RAM_ps * sim_time_duration             # [Bytes]
         if int(RAM_total) > RAM_available:                 # The int() is for removing the units
