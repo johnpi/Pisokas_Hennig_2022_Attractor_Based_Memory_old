@@ -274,7 +274,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, n
 
                                        G_extern2excit        = G_extern2excit * nS,
                                        stimulus_strength     = stimulus_strength * namp,
-                                       available_RAM = available_RAM
+                                       available_RAM         = available_RAM
                                       )
                         else:
                             print('ERROR: Parameter values not right.')
