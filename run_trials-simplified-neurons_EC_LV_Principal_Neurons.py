@@ -33,14 +33,14 @@ def run_trials(num_of_trials         = 20,
                t_window_width      = 200*ms,
                snapshot_interval   = 100*ms,
                synaptic_noise_amount = 0.0,
-               
+               poisson_firing_rate   = 2.3 * Hz,
+
                G_inhib2inhib         = 0.21658924 * nS, # 0.86635697  / 4.
                G_inhib2excit         = 0.93167505 * nS, # 3.7267002   / 4.
                G_excit2excit         = 16.5301927 * nS, # 66.12077086 / 4.
                G_excit2inhib         = 3.68324014 * nS, # 14.73296054 / 4.
                g_coop                = 7.64443366 * nS,  # Does not need scaling
                G_extern2excit        = 1.0 * nS,
-               poisson_firing_rate   = 2.3 * Hz,
                Jpos_excit2excit      = 1.6
               ):
     """
@@ -235,7 +235,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, available_RAM, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, neuronal_noise_Hz, stim_heading_degrees_list, N_trials, sim_time_duration, available_RAM, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -269,6 +269,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
                                        weight_scaling_factor = network_param[2],
                                        sim_time_duration     = sim_time_duration,
                                        synaptic_noise_amount = synaptic_noise_amount,
+                                       poisson_firing_rate   = neuronal_noise_Hz*Hz,
                                        G_inhib2inhib         = G_inhib2inhib * nS,
                                        G_inhib2excit         = G_inhib2excit * nS,
                                        G_excit2excit         = G_excit2excit * nS,
@@ -306,6 +307,9 @@ parser.add_argument('-N', '--neurons_num_exc', type=int, nargs='+', dest='neuron
 # Expect the amount of synaptic noise to use
 parser.add_argument('--weight_noise_SNR', type=float, nargs='+', dest='weight_noise_SNR', default=[0], 
                    help='One or more real numbers specifying the amount of synaptic weight noise (as SNR ratio) to use.')
+# The amount of neuronal noise to use
+parser.add_argument('--neuronal_noise_Hz', type=float, dest='neuronal_noise_Hz', default=2.3,
+                   help='A real number specifying the amount of neuronal noise (spontaneous spiking) received by each neuron (in Hz). Default 2.3.')
 # Expect the stimulus heading to use
 parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[180], 
                    help='One or more integer numbers specifying the stimulus heading to use.')
@@ -327,6 +331,7 @@ args = parser.parse_args()
 
 N_neurons_exc_list = args.neurons_num_exc
 weight_noise_SNR_list = args.weight_noise_SNR
+neuronal_noise_Hz = args.neuronal_noise_Hz
 headings_list = args.headings
 N_trials = args.trials
 duration = args.duration
@@ -335,7 +340,8 @@ available_RAM = args.available_RAM
 
 # Run trials
 explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list, 
-                    synaptic_noise_amount_list=weight_noise_SNR_list, 
+                    synaptic_noise_amount_list=weight_noise_SNR_list,
+                    neuronal_noise_Hz=neuronal_noise_Hz,
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
                     sim_time_duration = duration * 1000. * ms,
