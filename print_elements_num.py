@@ -27,4 +27,4 @@ for file in input_files:
         data = np.load(file, allow_pickle=True, encoding='bytes')
         print('File {} contains {} elements'.format(file, data.shape))
     except: 
-        print('File %s is not accessible')
+        print('File {} is not accessible'.format(file))
