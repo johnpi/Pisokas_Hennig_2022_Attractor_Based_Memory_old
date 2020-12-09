@@ -10,16 +10,6 @@
 
  vmem=16000000000 # In Bytes
  
-# Initialise the environment modules
-. /etc/profile.d/modules.sh
-
-source ~/.bashrc
-
-# Load Python
-module load anaconda/5.3.1
-
-conda activate Brian2
-
 # $1 full or reduced network
 # $2 the number of excitatory neurons
 # $3 the duration of the simulation
