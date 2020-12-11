@@ -42,7 +42,9 @@ python -m pip install --upgrade --user --no-binary :all: sklearn && \
 
 echo 
 echo "Installing extras: Jupyter notebooks"
-python -m pip install --upgrade --user --no-binary :all: jupyter
+python -m pip install --upgrade --user --no-binary :all: jupyter && \
+python -m pip install --upgrade --user --no-binary :all: ipykernel && \
+python -m ipykernel install --user && \
 [ $? -eq 0 ] && echo "Jupyter notebooks was installed successfully." || echo "Jupyter notebooks or its requirements were not installed."
 
 

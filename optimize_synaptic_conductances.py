@@ -431,22 +431,23 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         
         # Manually tuned for network size N_exc=1024 N_inh=256
         x0 = [0.0002, 0.010, 0.6, 2.0]
+        x0 = [0.0008, 0.010, 0.6, 2.0]
         
         # Manually tuned for network size N_exc=512 N_inh=128
-        x0 = [0.0004, 0.020, 1.2, 4.0] # x4
-        x0 = [0.0012111, 0.015, 0.9, 3.0] # x3
-        x0 = [0.0001, 0.020, 1.2, 4.0] # x4 except first
+        # x0 = [0.0004, 0.020, 1.2, 4.0] # x4
+        # x0 = [0.0012111, 0.015, 0.9, 3.0] # x3
+        # x0 = [0.0001, 0.020, 1.2, 4.0] # x4 except first
         
         # Manually tuned for network size N_exc=256 N_inh=64
-        x0 = [0.0008, 0.040, 2.4, 8.0]
-        x0 = [0.0032, 0.04,  3.4, 8.0]
+        # x0 = [0.0008, 0.040, 2.4, 8.0]
+        # x0 = [0.0032, 0.04,  3.4, 8.0]
         #x0 = [0.00545939215, 0.04, 3.40815238, 8.32985526]
 
         # Manually tuned for network size N_exc=4096 N_inh=1024
-        x0 = [0.0002, 0.0025, 0.15, 0.5]
+        # x0 = [0.0002, 0.0025, 0.15, 0.5]
 
         # Manually tuned for network size N_exc=8192 N_inh=2048
-        x0 = [0.0001, 0.00125, 0.075, 0.25]
+        # x0 = [0.0001, 0.00125, 0.075, 0.25]
         
     if option == 1:
         # Values must be positive
