@@ -43,6 +43,8 @@ def merge_file(output_file, input_files_list, max_entities=None):
     
     # For each input file
     for collected_data_file in input_files_list:
+        print('Processing file: ', collected_data_file)
+        
         # Try to load existing data if any otherwise create an empty collection
         try:
             collected_trials_data_input = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
