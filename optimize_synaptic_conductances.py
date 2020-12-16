@@ -447,6 +447,7 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         # Manually tuned for network size N_exc=1024 N_inh=256
         x0 = [0.0002, 0.010, 0.6, 2.0]
         x0 = [0.0008, 0.010, 0.6, 2.0]
+        x0 = [0.000753299518, 0.01, 0.6, 2.0]
         x0_dict[1024] = x0
 
         # Manually tuned for network size N_exc=512 N_inh=128
@@ -454,6 +455,8 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         x0 = [0.0012111, 0.015, 0.9, 3.0] # x3
         x0 = [0.0001, 0.020, 1.2, 4.0] # x4 except first
         x0 = [0.0000861990726, 0.0357004628, 3.24396393, 4.88193990] # x1
+        x0 = [0.000114210265,  0.0357004628, 3.24396393, 5.26641833] # x1
+        x0 = [0.000355507334,  0.0357004628, 3.24396393, 5.26641833]
         x0_dict[512] = x0
 
         # Manually tuned for network size N_exc=256 N_inh=64
