@@ -373,6 +373,8 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         # Results for optimising for network size N_exc=2048 N_inh=512
         # x0 = [0.21658924, 0.93167505, 16.5301927, 3.68324014, 7.64443366] # This is used for the data collection scalled to 2048
 
+        x0_dict = {}
+
         # Results for optimising for network size N_exc=4096 N_inh=1024
         # 
 
@@ -382,26 +384,35 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
 
         # Manually tuned for network size N_exc=2048 N_inh=512
         x0 = [0.0001, 0.005, 0.1, 1.0, 7.0]
-
+        x0_dict[2048] = x0
+        
         # Manually tuned for network size N_exc=1024 N_inh=256
         x0 = [0.0002, 0.010, 0.2, 2.0, 7.0]
-        
+        x0_dict[1024] = x0
+
         # Manually tuned for network size N_exc=512 N_inh=128
         x0 = [0.0004, 0.020, 0.4, 4.0, 7.0]
+        x0_dict[512] = x0
 
         # Manually tuned for network size N_exc=256 N_inh=64
         x0 = [0.0002, 0.040, 0.8, 8.0, 7.0]
         x0 = [0.0077, 0.040, 0.8, 8.0, 7.0]
+        x0_dict[256] = x0
 
         # Manually tuned for network size N_exc=128 N_inh=32
         x0 = [0.0077, 0.040, 0.8, 8.0, 7.0]
-        
+        x0_dict[128] = x0
+
         # Manually tuned for network size N_exc=4096 N_inh=1024
-        #x0 = [0.00005, 0.0025, 0.05, 0.669812245, 7.0]
+        x0 = [0.00005, 0.0025, 0.05, 0.669812245, 7.0]
+        x0_dict[4096] = x0
 
         # Manually tuned for network size N_exc=8192 N_inh=2048
-        #x0 = [0.000025, 0.00125, 0.025, 7.0]
-        
+        x0 = [0.000025, 0.00125, 0.025, 7.0]
+        x0_dict[8192] = x0
+
+        x0 = x0_dict[N_excitatory]
+
     elif model_opt == 'simple':
         bnds_xmax = [1, 100, 100, 100 ]
         bnds_xmax = [10, 100, 100, 100 ]
@@ -426,27 +437,45 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         #x0 = [2.38696367e+00, 6.75928742e-02, 9.16553022e+01, 1.30270070e+01] # f = 12.4867
         #x0 = [2.96741064e+00, 6.75928742e-02, 9.69622946e+01, 1.30270070e+01] # f = 12.6522
         
+        x0_dict = {}
+        
         # Manually tuned for network size N_exc=2048 N_inh=512
         x0 = [0.0001, 0.005, 0.3, 1.0]
+        x0 = [0.0004, 0.005, 0.3, 1.0]
+        x0_dict[2048] = x0
         
         # Manually tuned for network size N_exc=1024 N_inh=256
         x0 = [0.0002, 0.010, 0.6, 2.0]
-        
+        x0 = [0.0008, 0.010, 0.6, 2.0]
+        x0 = [0.000753299518, 0.01, 0.6, 2.0]
+        x0_dict[1024] = x0
+
         # Manually tuned for network size N_exc=512 N_inh=128
         x0 = [0.0004, 0.020, 1.2, 4.0] # x4
         x0 = [0.0012111, 0.015, 0.9, 3.0] # x3
         x0 = [0.0001, 0.020, 1.2, 4.0] # x4 except first
-        
+        x0 = [0.0000861990726, 0.0357004628, 3.24396393, 4.88193990] # x1
+        x0 = [0.000114210265,  0.0357004628, 3.24396393, 5.26641833] # x1
+        x0 = [0.000355507334,  0.0357004628, 3.24396393, 5.26641833]
+        x0 = [0.000125733024,  0.0357004628, 3.24396393, 5.26641833]
+        x0_dict[512] = x0
+
         # Manually tuned for network size N_exc=256 N_inh=64
         x0 = [0.0008, 0.040, 2.4, 8.0]
         x0 = [0.0032, 0.04,  3.4, 8.0]
         #x0 = [0.00545939215, 0.04, 3.40815238, 8.32985526]
+        x0 = [0.00210380550, 0.04, 3.4, 8.0]
+        x0_dict[256] = x0
 
         # Manually tuned for network size N_exc=4096 N_inh=1024
         x0 = [0.0002, 0.0025, 0.15, 0.5]
+        x0_dict[4096] = x0
 
         # Manually tuned for network size N_exc=8192 N_inh=2048
         x0 = [0.0001, 0.00125, 0.075, 0.25]
+        x0_dict[8192] = x0
+
+        x0 = x0_dict[N_excitatory]
         
     if option == 1:
         # Values must be positive

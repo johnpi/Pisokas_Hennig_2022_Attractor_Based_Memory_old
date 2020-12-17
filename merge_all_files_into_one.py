@@ -43,6 +43,8 @@ def merge_file(output_file, input_files_list, max_entities=None):
     
     # For each input file
     for collected_data_file in input_files_list:
+        print('Processing file: ', collected_data_file)
+        
         # Try to load existing data if any otherwise create an empty collection
         try:
             collected_trials_data_input = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
@@ -76,7 +78,7 @@ parser.add_argument('-f', '--file', type=str, dest='output_file', required=True,
                    help='Output filename to write all collected data to.')
 parser.add_argument('-i', '--input-files', type=str, nargs='+', dest='input_files', required=True,
 help='One or more filename of .npy files to read data from and combine them into one output file.')
-parser.add_argument('-m', '--max', type=int, dest='max_entities', required=False, default=None, 
+parser.add_argument('-m', '--max', type=int, dest='max_entities', required=False, default=None,
 help='Keep only the first [max] entries from each file and merge them to the output file.')
 
 # Parse the command line arguments
