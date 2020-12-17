@@ -50,7 +50,7 @@ def merge_file(output_file, input_files_list, max_entities=None):
             collected_trials_data_input = np.array([]) # Collected trials data records list
         
         if max_entities is not None and len(collected_trials_data_input) > max_entities:
-            for i in xrange(max_entities):
+            for i in range(max_entities):
                 item = collected_trials_data_input[i]
                 # Add new data record to the collected trials data
                 collected_trials_data = np.append(collected_trials_data, item)
@@ -84,7 +84,7 @@ args = parser.parse_args()
 
 input_files = args.input_files
 output_file = args.output_file
-max_entities = args max_entities
+max_entities = args.max_entities
 
 # Was
 # merge_file(merged_data_filename, collected_data_files_list)
