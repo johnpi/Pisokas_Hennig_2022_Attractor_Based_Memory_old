@@ -24,17 +24,17 @@ VERSION="eddie02"
 NOISE="2.3"
 
 # Usage string
- USAGE=$(cat <<- EOM
- USAGE
-     `basename $0` <MODEL> <NEURONS> <DURATION> <TRIALS> [NOISE] [VERSION]
+USAGE=$(cat <<- EOM
+USAGE
+    `basename $0` <MODEL> <NEURONS> <DURATION> <TRIALS> [NOISE] [VERSION]
 
-         MODEL      : The model to use: 'full' or 'reduced' network
-         NEURONS    : The number of excitatory neurons
-         DURATION   : The duration of the simulation in seconds
-         TRIALS     : The number of trials to run
-         NOISE      : The amount of neuronal noise (optional, default 2.3)
-         VERSION    : The version code to use in the filenames (optional)
- EOM
+     MODEL      : The model to use: 'full' or 'reduced' network
+     NEURONS    : The number of excitatory neurons
+     DURATION   : The duration of the simulation in seconds
+     TRIALS     : The number of trials to run
+     NOISE      : The amount of neuronal noise (optional, default 2.3)
+     VERSION    : The version code to use in the filenames (optional)
+EOM
 )
 
 # Check if the required arguments were given
