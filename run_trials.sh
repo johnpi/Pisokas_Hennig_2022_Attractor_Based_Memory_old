@@ -19,7 +19,7 @@ USAGE=$(cat <<- EOM
 USAGE
     `basename $0` <MODEL> <NEURONS> <DURATION> <TRIALS> [NOISE] [VERSION]
 
-     MODEL      : The model to use: 'full' or 'reduced' network
+     MODEL      : The model to use: 'full', 'reduced' or 'NMDA' network
      NEURONS    : The number of excitatory neurons
      DURATION   : The duration of the simulation in seconds
      TRIALS     : The number of trials to run
@@ -55,3 +55,7 @@ if [ "${MODEL}" == "full" ]; then
    python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "Data/collected_drift_trials_all_EC_LV_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
+if [ "${MODEL}" == "NMDA" ]; then
+   echo    "Running: python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} -a ${vmem} -f Data/collected_drift_trials_all_NMDA_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "Data/collected_drift_trials_all_NMDA_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+fi
