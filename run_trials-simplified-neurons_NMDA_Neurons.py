@@ -39,6 +39,7 @@ def run_trials(num_of_trials         = 20,
                G_inhib2excit         = .35 * 1.336 * nS, # 3.7267002   / 4.
                G_excit2excit         = .35 * 0.381 * nS, # 66.12077086 / 4.
                G_excit2inhib         = .35 * 1.2 * 0.292 * nS, # 14.73296054 / 4.
+               G_extern2inhib        = 2.38 * nS, 
                G_extern2excit        = 3.1 * nS,
                Jpos_excit2excit      = 1.6
               ):
