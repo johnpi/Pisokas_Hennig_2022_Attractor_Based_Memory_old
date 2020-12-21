@@ -39,7 +39,7 @@ def run_trials(num_of_trials         = 20,
                G_inhib2excit         = .35 * 1.336 * nS, # 3.7267002   / 4.
                G_excit2excit         = .35 * 0.381 * nS, # 66.12077086 / 4.
                G_excit2inhib         = .35 * 1.2 * 0.292 * nS, # 14.73296054 / 4.
-               G_extern2inhib        = 2.38 * nS, 
+               G_extern2inhib        = 2.38 * nS,
                G_extern2excit        = 3.1 * nS,
                Jpos_excit2excit      = 1.6
               ):
@@ -186,7 +186,8 @@ network_parameters_dict = {
 # Entry structure
 #         (N_excitatory, N_inhibitory, weight_scaling_factor, [G_inhib2inhib, G_inhib2excit, G_excit2excit, G_excit2inhib, g_coop, G_extern2excit, stimulus_strength])
 network_parameters_dict = {
-     256: (256,   64, 1.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
+     128: (128,   32, 16.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
+     256: (256,   64, 8.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
      512: (512,  128, 4.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
     1024: (1024, 256, 2.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
     2048: (2048, 512, 1.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
