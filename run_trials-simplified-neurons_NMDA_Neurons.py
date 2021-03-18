@@ -184,7 +184,7 @@ network_parameters_dict = {
    32768: (32768,8192, 0.0625)
 }
 # Entry structure
-#         (N_excitatory, N_inhibitory, weight_scaling_factor, [G_inhib2inhib, G_inhib2excit, G_excit2excit, G_excit2inhib, g_coop, G_extern2excit, stimulus_strength])
+#         (N_excitatory, N_inhibitory, weight_scaling_factor, [G_inhib2inhib, G_inhib2excit, G_excit2excit, G_excit2inhib, G_extern2inhib, G_extern2excit, stimulus_strength])
 network_parameters_dict = {
      128: (128,   32, 16.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
      256: (256,   64, 8.0, [.35 * 1.024, .35 * 1.336, .35 * 0.381, .35 * 1.2 * 0.292,  2.38, 3.1, 1.5]),
