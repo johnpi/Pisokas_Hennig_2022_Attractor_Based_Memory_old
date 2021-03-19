@@ -534,8 +534,9 @@ def simulate_wm_EC_LV_Principal_Neurons(
         G_inhib2excit=.35 * 1.336 * b2.nS, # was wi=6nS
         G_excit2excit=.35 * 0.381 * b2.nS, # was we=6nS
         G_excit2inhib=.35 * 1.2 * 0.292 * b2.nS,
-        G_extern2excit=24 * b2.nS,
         G_extern2inhib = 2.38 * b2.nS,
+        #G_extern2excit=24 * b2.nS,
+        G_extern2excit = 3.1 * b2.nS, # Temp for testing
         g_coop = 0.400 * b2.nS,
         monitored_subset_size=1024, sim_time=800. * b2.ms,
         synaptic_noise_amount=0.0):
@@ -641,6 +642,7 @@ def simulate_wm_EC_LV_Principal_Neurons(
     G_leak_inhib = gl # 20.0 * b2.nS
     E_leak_inhib = El # -70.0 * b2.mV
     v_firing_threshold_inhib = 10 * b2.mV # -50.0 * b2.mV
+    v_firing_threshold_inhib = -50.0 * b2.mV
     v_reset_inhib = -60.0 * b2.mV
     t_abs_refract_inhib = 2.0 * b2.ms
 
@@ -656,6 +658,7 @@ def simulate_wm_EC_LV_Principal_Neurons(
     E_NMDA = 0.0 * b2.mV
     tau_NMDA_s = 65.0 * b2.ms  # orig: 100
     tau_NMDA_x = 1.88 * b2.ms
+    tau_NMDA_y = 1.88 * b2.ms
     alpha_NMDA = 0.5 * b2.kHz
 
     # projections from the external population
@@ -704,11 +707,14 @@ def simulate_wm_EC_LV_Principal_Neurons(
     # define the inhibitory population
     inhib_HH_dynamics = b2.Equations("""
         I_stim : amp
+        s_NMDA_total : 1  # the post synaptic sum of s. compare with s_NMDA_presyn
         dv/dt = (
                  - G_leak_inhib * (v-E_leak_excit)
-                 - G_excit2excit * s_mAChR * (v-Ee)
+                 - G_extern2inhib * s_AMPA * (v-E_AMPA)
                  - G_inhib2inhib * s_GABA * (v-E_GABA)
                  - G_excit2inhib * s_AMPA * (v-E_AMPA)
+                 - G_excit2inhib * s_NMDA_total * (v-E_NMDA)/(1.0+1.0*exp(-0.062*v/volt)/3.57)
+                 - G_excit2excit * s_mAChR * (v-Ee)
                  - g_na*(m*m)*h*(v-ENa)
                  - g_kd*(n*n)*(v-EK)
                  + g_coop*O_coop*mV
@@ -759,11 +765,13 @@ def simulate_wm_EC_LV_Principal_Neurons(
     # specify the Hodgkin-Huxley excitatory population: EC Layer V principal neuron:
     excit_HH_dynamics_EC_LV = b2.Equations("""
         I_stim : amp
+        s_NMDA_total : 1  # the post synaptic sum of s. compare with s_NMDA_presyn
         dv/dt = (
                  - G_leak_excit * (v-E_leak_excit)
-                 - G_excit2excit * s_mAChR * (v-Ee)
-                 - G_inhib2excit * s_GABA * (v-E_GABA)
                  - G_extern2excit * s_AMPA * (v-E_AMPA)
+                 - G_inhib2excit * s_GABA * (v-E_GABA)
+                 - G_excit2excit * s_mAChR * (v-Ee)
+                 - G_excit2excit * s_NMDA_total * (v-E_NMDA)/(1.0+1.0*exp(-0.062*v/volt)/3.57)
                  - g_na*(m*m)*h*(v-ENa)
                  - g_kd*(n*n)*(v-EK)
                  + g_coop*O_coop*mV
@@ -774,6 +782,8 @@ def simulate_wm_EC_LV_Principal_Neurons(
         ds_AMPA/dt = -s_AMPA/tau_AMPA : 1
         ds_GABA/dt = -s_GABA/tau_GABA : 1
         ds_mAChR/dt = -s_mAChR/tau_mAChR : 1
+        ds_NMDA/dt = -s_NMDA/tau_NMDA_s + alpha_NMDA * y * (1-s_NMDA) : 1
+        dy/dt = -y/tau_NMDA_y : 1
 
         dO_coop_unbounded/dt = (factor_inc*((G_excit2excit * s_mAChR)/siemens))/tau_coop - (factor_dec*((G_inhib2excit * s_GABA)/siemens))/tau_coop : 1
         #O_coop = O_coop_unbounded * int(O_coop_unbounded>0) : 1
@@ -818,8 +828,11 @@ def simulate_wm_EC_LV_Principal_Neurons(
     syn_inhib2excit.connect(p=1.0)
 
     # set the connections: excitatory to inhibitory NMDA connections
+    #syn_excit2inhib = Synapses(excit_pop, inhib_pop,
+    #                           on_pre="s_AMPA += 1.0")
+    # set the connections: excitatory to inhibitory NMDA connections
     syn_excit2inhib = Synapses(excit_pop, inhib_pop,
-                               on_pre="s_AMPA += 1.0")
+                               model="s_NMDA_total_post = s_NMDA_pre : 1 (summed)")
     syn_excit2inhib.connect(p=1.0)
 
     # # set the connections: UNSTRUCTURED excitatory to excitatory
@@ -837,13 +850,13 @@ def simulate_wm_EC_LV_Principal_Neurons(
     Gain = Jneg_excit2excit + (Jpos_excit2excit - Jneg_excit2excit)
     syn_excit2excit.w = 'Gain * exp( -(360.0 * min(abs(x_pre-x_post), N_excitatory - abs(x_pre-x_post)) / N_excitatory)**2 / (2 * sigma_weight_profile**2))'
 
-    # # set the STRUCTURED recurrent input. use a network_operation
-    # @network_operation()
-    # def update_nmda_sum():
-    #     fft_s_NMDA = rfft(excit_pop.s_NMDA)
-    #     fft_s_NMDA_total = numpy.multiply(fft_presyn_weight_kernel, fft_s_NMDA)
-    #     s_NMDA_tot = irfft(fft_s_NMDA_total)
-    #     excit_pop.s_NMDA_total_ = s_NMDA_tot
+    # set the STRUCTURED recurrent input. use a network_operation
+    @network_operation()
+    def update_nmda_sum():
+        fft_s_NMDA = rfft(excit_pop.s_NMDA)
+        fft_s_NMDA_total = numpy.multiply(fft_presyn_weight_kernel, fft_s_NMDA)
+        s_NMDA_tot = irfft(fft_s_NMDA_total)
+        excit_pop.s_NMDA_total_ = s_NMDA_tot
 
     @network_operation(dt=1 * b2.ms)
     def stimulate_network(t):
