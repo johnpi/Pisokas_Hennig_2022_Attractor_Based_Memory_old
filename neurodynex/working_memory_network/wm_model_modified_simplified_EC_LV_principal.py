@@ -755,7 +755,7 @@ def simulate_wm_EC_LV_Principal_Neurons(
     syn_inhib2inhib = Synapses(inhib_pop, target=inhib_pop, on_pre="s_GABA += 1.0", delay=0.0 * b2.ms)
     syn_inhib2inhib.connect(condition="i!=j", p=1.0)
     # set the connections: extern2inhib
-    input_ext2inhib = PoissonInput(target=inhib_pop, target_var="s_AMPAext",
+    input_ext2inhib = PoissonInput(target=inhib_pop, target_var="s_AMPA",
                                    N=N_extern_poisson, rate=poisson_firing_rate, weight=1.0)
 
     # specify the Hodgkin-Huxley excitatory population: EC Layer V principal neuron:
