@@ -335,10 +335,6 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
         bnds_xmax = [0.01, 10, 10, 10,  7.01]
         bnds_xmin = [0.,  0.,  0.,  0., 6.99]
         
-        # Updated after adding and NMDA, the Compte paper argues the first two onductances must be larger than the 3rd and 4th
-        bnds_xmax = [1.00,  1.00,  1.00,  1.00, 0.70]
-        bnds_xmin = [0.10,  0.10,  0.01,  0.01, 0.10]
-
         # define the space of hyperparameters to search
         search_space = [Real(0, 1),  # G_inhib2inhib
                         Real(0, 10), # G_inhib2excit
@@ -388,38 +384,31 @@ def optimise(option, model='EC_LV', N_excitatory=512, N_inhibitory = 128, poisso
 
         # Manually tuned for network size N_exc=2048 N_inh=512
         x0 = [0.0001, 0.005, 0.1, 1.0, 7.0]
-        x0 = [0.3, 0.05, 0.3, 0.1, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[2048] = x0
         
         # Manually tuned for network size N_exc=1024 N_inh=256
         x0 = [0.0002, 0.010, 0.2, 2.0, 7.0]
-        x0 = [0.6, 0.1, 0.6, 0.2, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[1024] = x0
 
         # Manually tuned for network size N_exc=512 N_inh=128
         x0 = [0.0004, 0.020, 0.4, 4.0, 7.0]
-        x0 = [1.2, 0.2, 1.2, 0.4, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[512] = x0
 
         # Manually tuned for network size N_exc=256 N_inh=64
         x0 = [0.0002, 0.040, 0.8, 8.0, 7.0]
         x0 = [0.0077, 0.040, 0.8, 8.0, 7.0]
-        x0 = [2.4, 0.4, 2.4, 0.8, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[256] = x0
 
         # Manually tuned for network size N_exc=128 N_inh=32
         x0 = [0.0077, 0.040, 0.8, 8.0, 7.0]
-        x0 = [4.8, 0.8, 4.8, 1.6, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[128] = x0
 
         # Manually tuned for network size N_exc=4096 N_inh=1024
         x0 = [0.00005, 0.0025, 0.05, 0.669812245, 7.0]
-        x0 = [0.15, 0.025, 0.15, 0.05, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[4096] = x0
 
         # Manually tuned for network size N_exc=8192 N_inh=2048
         x0 = [0.000025, 0.00125, 0.025, 7.0]
-        x0 = [0.075, 0.0125, 0.075, 0.025, 0.4] # Updated after adding and NMDA, the Compte paper argues ...
         x0_dict[8192] = x0
 
         x0 = x0_dict[N_excitatory]
