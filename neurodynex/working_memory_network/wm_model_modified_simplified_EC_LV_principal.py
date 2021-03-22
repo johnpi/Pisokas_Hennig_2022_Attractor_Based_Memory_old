@@ -887,7 +887,7 @@ def simulate_wm_EC_LV_Principal_Neurons(
 
 
 
-
+# This version introduces the external noise to the inhibitory population which should have been there but somehow missed.
 # Model using EC Layer V principal neuron dynamics model
 def simulate_wm_EC_LV_Principal_Neurons_1(
         N_excitatory=1024,          N_inhibitory=256,
@@ -1258,7 +1258,7 @@ def simulate_wm_EC_LV_Principal_Neurons_1(
 
 
 
-
+# This is not working it was just an attempt
 # Model using EC Layer V principal neuron dynamics model
 def simulate_wm_EC_LV_Principal_Neurons_2(
         N_excitatory=1024,          N_inhibitory=256,
