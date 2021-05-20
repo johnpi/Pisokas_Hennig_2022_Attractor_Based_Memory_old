@@ -73,7 +73,7 @@ def pick_time_series_list(collected_data_file,
         collected_data_files = collected_data_file
     
     for collected_data_file in collected_data_files:
-        print('    Processing file:', collected_data_file)
+        print('      Processing file:', collected_data_file)
         # Try to load existing data if any otherwise create an empty collection
         try:
             #collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
@@ -89,10 +89,10 @@ def pick_time_series_list(collected_data_file,
                                     operator              = 'and'
                                  )
         except: 
-            print('    Exception while running pick_data_samples()')
+            print('      Exception while running pick_data_samples()')
             collected_trials_data = np.array([]) # Collected trials data records list
         
-        print('      len(collected_trials_data)', len(collected_trials_data))
+        print('        Got len(collected_trials_data)', len(collected_trials_data))
         
         # We use enumerate to add a count to the iterated items of the iterator
         for i, item in enumerate(collected_trials_data):
@@ -162,6 +162,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
     num_of_plot_keys = len(plot_keys_list)
 
     for i,plot_key in enumerate(plot_keys_list):
+        print('    Look for N_excitatory', plot_key)
         plot_item = pick_time_series_list(collected_data_file, 
                                           stimulus_center_deg   = stimulus_center_deg,
                                           stimulus_width_deg    = None,
@@ -170,7 +171,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
                                           synaptic_noise_amount = synaptic_noise_amount,
                                           unwrap_modulo_angles  = unwrap_modulo_angles
                                          )
-        print('  len(plot_item)', len(plot_item))
+        print('    Got len(plot_item[theta_ts_list])', len(plot_item['theta_ts_list']))
         plot_items_dict[plot_key] = plot_item
     return plot_items_dict
 
@@ -190,24 +191,29 @@ def merge_file(output_file):
     
     collected_trials_data = {} # Collected trials data records list
 
-    
-    collected_data_file_pattern = './Data/collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
+    path = './Data/'
+    path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
+    collected_data_file_pattern = path + 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
     models_list           = ['NMDA', 'EC_LV_1']
-    neurons_num_list      = [256, 512, 1024, 2048, 4096, 8192]
+    neurons_num_list      = [128, 256, 512, 1024, 2048, 4096, 8192]
+    neurons_num_list      = [128, 256]
     poisson_firing_rate   = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+    poisson_firing_rate   = [0.001, 0.002]
     stimulus_center_deg   = 180
     synaptic_noise_amount = 0
     
     # For each model type
     for model in models_list:
+        print(model)
         collected_trials_data[model] = {}
         # For each neuronal noise level
         for poisson_neuron_noise in poisson_firing_rate:
-            
-            print('Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
+            print('  poisson_neuron_noise', poisson_neuron_noise)
+            print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
             collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
-            print('Found {:} files.'.format(collected_data_file_list))
+            print('  Found {:} files.'.format(collected_data_file_list))
             
+            print('  Call pick_net_size_data()')
             plot_items_dict = pick_net_size_data(collected_data_file_list, 
                                                  neurons_num_list, 
                                                  stimulus_center_deg = stimulus_center_deg, 
