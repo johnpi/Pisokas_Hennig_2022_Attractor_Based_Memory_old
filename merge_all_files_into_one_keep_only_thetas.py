@@ -14,6 +14,41 @@ from utility_functions import *
 from Python_Libs.utility_functions import *
 
 
+def dispertion_of_absolute_deviation(expected_value, time_series_list):
+    """
+        Returns a measure of dispertion of the absolute deviation (MAD) of time series produced 
+        by multiple trials at each point in time. That is a measure of 
+        dispersion over time. 
+        $MAD = \frac{1}{N} \sum_{i=0}^{N} \abs{x_{i} - mean(X)}$ 
+        MAD is a better measure than standard deviation (SD). 
+        
+        expected_value   : The expected value for MAD normally is the mean of 
+                           the sample. That is the mean value of all time series 
+                           at that point in time. However you can provide 
+                           any expected value here.
+        time_series_list : A list or np.array containing np.arrays of several 
+                           time series. All time series must have the same 
+                           number of items. 
+        Returns          : A time series with elements the dispertion of the absolute 
+                           deviations at each point in time. It has the same number 
+                           of items as the contained time series. 
+    """
+    
+    # The absolute value of the differences of the time series samples from the expected value
+    
+    abs_diff_list = []
+    # Get the absolute deviation of each item of the series from the expected value
+    for ts in time_series_list:
+        abs_diff = np.abs(np.ones(len(ts)) * expected_value - ts)
+        abs_diff_list.append(abs_diff)
+    
+    # Get the mean absolute deviation across all time series at each point in time
+    abs_diff_mean = np.std(abs_diff_list, axis=0)
+    
+    return abs_diff_mean
+
+
+
 def pick_time_series_list(collected_data_file, 
                           stimulus_center_deg   = None,
                           stimulus_width_deg    = None,
@@ -165,12 +200,12 @@ def merge_file(output_file):
         # For each neuronal noise level
         for poisson_neuron_noise in poisson_firing_rate:
             
-            print('Get matching files: {:}'.format(collected_data_file_pattern.format(models, poisson_neuron_noise, '*')))
-            collected_data_file_list = glob.glob(collected_data_file_pattern.format(models, poisson_neuron_noise, '*'))
-            print('Found {:} files.'format(collected_data_file_list))
+            print('Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
+            collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
+            print('Found {:} files.'.format(collected_data_file_list))
             
             plot_items_dict = pick_net_size_data(collected_data_file_list, 
-                                                 plot_keys_list = neurons_num_list, 
+                                                 neurons_num_list, 
                                                  stimulus_center_deg = stimulus_center_deg, 
                                                  synaptic_noise_amount = synaptic_noise_amount,
                                                  unwrap_modulo_angles = True)
