@@ -92,7 +92,7 @@ def pick_time_series_list(collected_data_file,
             print('    Exception while running pick_data_samples()')
             collected_trials_data = np.array([]) # Collected trials data records list
         
-        print('      collected_trials_data.shape', collected_trials_data.shape)
+        print('      len(collected_trials_data)', len(collected_trials_data))
         
         # We use enumerate to add a count to the iterated items of the iterator
         for i, item in enumerate(collected_trials_data):
