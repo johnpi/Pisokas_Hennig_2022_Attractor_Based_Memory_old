@@ -196,13 +196,13 @@ def merge_file(output_file):
 
     path = './Data/'
     path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
-    #path = '/exports/eddie/scratch/s0093128/Data/Backup/'
+    path = '/exports/eddie/scratch/s0093128/Data/Backup/'
     collected_data_file_pattern = path + 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
     models_list           = ['NMDA', 'EC_LV_1']
     neurons_num_list      = [128, 256, 512, 1024, 2048, 4096, 8192]
-    neurons_num_list      = [256, 8192]
+    #neurons_num_list      = [256, 8192]
     poisson_firing_rate   = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
-    poisson_firing_rate   = [0.001, 0.002]
+    #poisson_firing_rate   = [0.001, 0.002]
     stimulus_center_deg   = 180
     synaptic_noise_amount = 0
     
