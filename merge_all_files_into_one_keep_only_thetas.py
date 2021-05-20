@@ -73,6 +73,7 @@ def pick_time_series_list(collected_data_file,
         collected_data_files = collected_data_file
     
     for collected_data_file in collected_data_files:
+        print('    Processing file:', collected_data_file)
         # Try to load existing data if any otherwise create an empty collection
         try:
             #collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
@@ -88,8 +89,11 @@ def pick_time_series_list(collected_data_file,
                                     operator              = 'and'
                                  )
         except: 
+            print('    Exception while running pick_data_samples()')
             collected_trials_data = np.array([]) # Collected trials data records list
-
+        
+        print('      collected_trials_data.shape', collected_trials_data.shape)
+        
         # We use enumerate to add a count to the iterated items of the iterator
         for i, item in enumerate(collected_trials_data):
             # Simulation set up info
@@ -166,7 +170,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
                                           synaptic_noise_amount = synaptic_noise_amount,
                                           unwrap_modulo_angles  = unwrap_modulo_angles
                                          )
-        
+        print('  len(plot_item)', len(plot_item))
         plot_items_dict[plot_key] = plot_item
     return plot_items_dict
 
