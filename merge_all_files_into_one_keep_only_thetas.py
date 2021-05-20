@@ -171,7 +171,10 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
                                           synaptic_noise_amount = synaptic_noise_amount,
                                           unwrap_modulo_angles  = unwrap_modulo_angles
                                          )
-        print('    Got len(plot_item[theta_ts_list])', len(plot_item['theta_ts_list']))
+        if plot_item is not None:
+            print('    Got len(plot_item[theta_ts_list])', len(plot_item['theta_ts_list']))
+        else: 
+            print('    plot_item is empty')
         plot_items_dict[plot_key] = plot_item
     return plot_items_dict
 
@@ -193,10 +196,11 @@ def merge_file(output_file):
 
     path = './Data/'
     path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
+    #path = '/exports/eddie/scratch/s0093128/Data/Backup/'
     collected_data_file_pattern = path + 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
     models_list           = ['NMDA', 'EC_LV_1']
     neurons_num_list      = [128, 256, 512, 1024, 2048, 4096, 8192]
-    neurons_num_list      = [128, 256]
+    neurons_num_list      = [256, 8192]
     poisson_firing_rate   = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
     poisson_firing_rate   = [0.001, 0.002]
     stimulus_center_deg   = 180
