@@ -14,6 +14,41 @@ from utility_functions import *
 from Python_Libs.utility_functions import *
 
 
+def dispertion_of_absolute_deviation(expected_value, time_series_list):
+    """
+        Returns a measure of dispertion of the absolute deviation (MAD) of time series produced 
+        by multiple trials at each point in time. That is a measure of 
+        dispersion over time. 
+        $MAD = \frac{1}{N} \sum_{i=0}^{N} \abs{x_{i} - mean(X)}$ 
+        MAD is a better measure than standard deviation (SD). 
+        
+        expected_value   : The expected value for MAD normally is the mean of 
+                           the sample. That is the mean value of all time series 
+                           at that point in time. However you can provide 
+                           any expected value here.
+        time_series_list : A list or np.array containing np.arrays of several 
+                           time series. All time series must have the same 
+                           number of items. 
+        Returns          : A time series with elements the dispertion of the absolute 
+                           deviations at each point in time. It has the same number 
+                           of items as the contained time series. 
+    """
+    
+    # The absolute value of the differences of the time series samples from the expected value
+    
+    abs_diff_list = []
+    # Get the absolute deviation of each item of the series from the expected value
+    for ts in time_series_list:
+        abs_diff = np.abs(np.ones(len(ts)) * expected_value - ts)
+        abs_diff_list.append(abs_diff)
+    
+    # Get the mean absolute deviation across all time series at each point in time
+    abs_diff_mean = np.std(abs_diff_list, axis=0)
+    
+    return abs_diff_mean
+
+
+
 def pick_time_series_list(collected_data_file, 
                           stimulus_center_deg   = None,
                           stimulus_width_deg    = None,
@@ -38,6 +73,7 @@ def pick_time_series_list(collected_data_file,
         collected_data_files = collected_data_file
     
     for collected_data_file in collected_data_files:
+        print('      Processing file:', collected_data_file)
         # Try to load existing data if any otherwise create an empty collection
         try:
             #collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
@@ -53,8 +89,11 @@ def pick_time_series_list(collected_data_file,
                                     operator              = 'and'
                                  )
         except: 
+            print('      Exception while running pick_data_samples()')
             collected_trials_data = np.array([]) # Collected trials data records list
-
+        
+        print('        Got len(collected_trials_data)', len(collected_trials_data))
+        
         # We use enumerate to add a count to the iterated items of the iterator
         for i, item in enumerate(collected_trials_data):
             # Simulation set up info
@@ -123,6 +162,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
     num_of_plot_keys = len(plot_keys_list)
 
     for i,plot_key in enumerate(plot_keys_list):
+        print('    Look for N_excitatory', plot_key)
         plot_item = pick_time_series_list(collected_data_file, 
                                           stimulus_center_deg   = stimulus_center_deg,
                                           stimulus_width_deg    = None,
@@ -131,7 +171,10 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
                                           synaptic_noise_amount = synaptic_noise_amount,
                                           unwrap_modulo_angles  = unwrap_modulo_angles
                                          )
-        
+        if plot_item is not None:
+            print('    Got len(plot_item[theta_ts_list])', len(plot_item['theta_ts_list']))
+        else: 
+            print('    plot_item is empty')
         plot_items_dict[plot_key] = plot_item
     return plot_items_dict
 
@@ -151,27 +194,32 @@ def merge_file(output_file):
     
     collected_trials_data = {} # Collected trials data records list
 
-    
-    collected_data_file_pattern = '/exports/eddie/scratch/s0093128/Data/Backup/collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
+    path = './Data/'
+    path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
+    path = '/exports/eddie/scratch/s0093128/Data/Backup/'
+    collected_data_file_pattern = path + 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
     models_list           = ['NMDA', 'EC_LV_1']
-    neurons_num_list      = [256, 512, 1024, 2048, 4096, 8192]
-    plot_keys_list        = neurons_num_list
+    neurons_num_list      = [128, 256, 512, 1024, 2048, 4096, 8192]
+    neurons_num_list      = [256, 8192]
     poisson_firing_rate   = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+    poisson_firing_rate   = [0.001, 0.002]
     stimulus_center_deg   = 180
     synaptic_noise_amount = 0
     
     # For each model type
     for model in models_list:
+        print(model)
         collected_trials_data[model] = {}
         # For each neuronal noise level
         for poisson_neuron_noise in poisson_firing_rate:
-            
-            print('Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
+            print('  poisson_neuron_noise', poisson_neuron_noise)
+            print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
             collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
-            print('Found {:} files.'.format(collected_data_file_list))
+            print('  Found {:} files.'.format(collected_data_file_list))
             
+            print('  Call pick_net_size_data()')
             plot_items_dict = pick_net_size_data(collected_data_file_list, 
-                                                 plot_keys_list, 
+                                                 neurons_num_list, 
                                                  stimulus_center_deg = stimulus_center_deg, 
                                                  synaptic_noise_amount = synaptic_noise_amount,
                                                  unwrap_modulo_angles = True)
