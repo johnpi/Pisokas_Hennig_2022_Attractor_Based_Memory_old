@@ -6,7 +6,6 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 # Load libraries
 import sys
 import argparse # For command line argument parsing
-
 import numpy as np
 
 
