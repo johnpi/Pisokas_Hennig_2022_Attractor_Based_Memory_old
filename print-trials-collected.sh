@@ -9,7 +9,7 @@ do
   do 
     for n in 0.001 0.002 0.003 0.004 0.005 0.006 0.007 0.008 0.009; 
     do 
-      x=$(cat ${1} | grep _${N} | grep ${net} | grep ${n} | sed 's/.*(//' | sed 's/,).*//'); 
+      x=$(cat "${1}" | grep _${N} | grep ${net} | grep ${n} | sed 's/.*(//' | sed 's/,).*//'); 
       sum=0; 
       for num in $(echo $x); 
       do 
