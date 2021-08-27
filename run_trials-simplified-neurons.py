@@ -31,6 +31,7 @@ def run_trials(num_of_trials         = 20,
                t_window_width      = 200*ms,
                snapshot_interval   = 100*ms,
                synaptic_noise_amount = 0.0,
+               poisson_firing_rate   = 2.3 * Hz,
                
                J_inhib2inhib    = 0.3 / 1000,
                J_inhib2excit    = 0.3 / 1000,
@@ -93,7 +94,7 @@ def run_trials(num_of_trials         = 20,
         if int(RAM_total) > RAM_available:                 # The int() is for removing the units
             mon_neurons_factor = RAM_available / RAM_total
             monitored_subset_size = int(monitored_subset_size * mon_neurons_factor)
-        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified.simulate_wm_simple(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size, J_inhib2inhib = J_inhib2inhib, J_inhib2excit = J_inhib2excit, Jpos_excit2excit=Jpos_excit2excit, J_excit2inhib = J_excit2inhib, J_ext2inhib = J_ext2inhib, J_ext2excit = J_ext2excit, tau_excit=tau_excit, tau_inhib=tau_inhib)
+        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified.simulate_wm_simple(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, poisson_firing_rate=poisson_firing_rate, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size, J_inhib2inhib = J_inhib2inhib, J_inhib2excit = J_inhib2excit, Jpos_excit2excit=Jpos_excit2excit, J_excit2inhib = J_excit2inhib, J_ext2inhib = J_ext2inhib, J_ext2excit = J_ext2excit, tau_excit=tau_excit, tau_inhib=tau_inhib)
         
         t_snapshots = range(
             int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
@@ -213,7 +214,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, stim_heading_degrees_list, N_trials, sim_time_duration, tau_membrane_list, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, neuronal_noise_Hz, stim_heading_degrees_list, N_trials, sim_time_duration, tau_membrane_list, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -236,6 +237,7 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, s
                                        weight_scaling_factor = network_param[2],
                                        sim_time_duration     = sim_time_duration,
                                        synaptic_noise_amount = synaptic_noise_amount,
+                                       poisson_firing_rate   = neuronal_noise_Hz*Hz,
                                        tau_excit             = tau_membrane * ms,
                                        tau_inhib             = tau_membrane * ms / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
                                       )
@@ -264,6 +266,9 @@ parser.add_argument('-N', '--neurons_num_exc', type=int, nargs='+', dest='neuron
 # Expect the amount of synaptic noise to use
 parser.add_argument('--weight_noise_SNR', type=float, nargs='+', dest='weight_noise_SNR', default=[0], 
                    help='One or more real numbers specifying the amount of synaptic weight noise (as SNR ratio) to use.')
+# The amount of neuronal noise to use
+parser.add_argument('--neuronal_noise_Hz', type=float, dest='neuronal_noise_Hz', default=2.3,
+                   help='A real number specifying the amount of neuronal noise (spontaneous spiking) received by each neuron (in Hz). Default 2.3.')
 # Expect the stimulus heading to use
 parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[180], 
                    help='One or more integer numbers specifying the stimulus heading to use.')
@@ -285,6 +290,7 @@ args = parser.parse_args()
 
 N_neurons_exc_list = args.neurons_num_exc
 weight_noise_SNR_list = args.weight_noise_SNR
+neuronal_noise_Hz = args.neuronal_noise_Hz
 headings_list = args.headings
 N_trials = args.trials
 duration = args.duration
@@ -294,6 +300,7 @@ filename = args.filename
 # Run trials
 explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list, 
                     synaptic_noise_amount_list=weight_noise_SNR_list, 
+                    neuronal_noise_Hz=neuronal_noise_Hz,
                     stim_heading_degrees_list = headings_list, 
                     N_trials = N_trials,
                     sim_time_duration = duration * 1000. * ms, 
