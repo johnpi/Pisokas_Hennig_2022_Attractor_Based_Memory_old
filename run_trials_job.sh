@@ -22,6 +22,7 @@ vmem=16000000000 # Available RAM in Bytes
 # Defaults for optional parameters
 VERSION="eddie02"
 NOISE="2.3"
+TAU_MEM="10"
 
 # Usage string
 USAGE=$(cat <<- EOM
@@ -53,6 +54,7 @@ DURATION=${3}            # $3 : the duration of the simulation
 TRIALS=${4}              # $4 : the number of trials to run
 NOISE=${5:-${NOISE}}     # $5 : the amount of neuronal noise (optional, default 2.3)
 VERSION=${6:-${VERSION}} # $6 : the version code to use in the filenames (optional)
+TAU_M=${7:-${TAU_MEM}}   # $7 : the neuronal membrane time constant in ms (optional, only used by the SIMPLE model)
 
 # Initialise the environment modules
 . /etc/profile.d/modules.sh
