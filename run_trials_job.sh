@@ -28,7 +28,7 @@ USAGE=$(cat <<- EOM
 USAGE
     `basename $0` <MODEL> <NEURONS> <DURATION> <TRIALS> [NOISE] [VERSION] [TAU_M]
 
-     MODEL      : The model to use: 'NMDA', 'EC_LV_1', 'SIMPLE', 'full', 'reduced' or network
+     MODEL      : The model to use: 'NMDA', 'EC_LV_1', 'SIMPLE', 'full', or 'reduced' network
      NEURONS    : The number of excitatory neurons
      DURATION   : The duration of the simulation in seconds
      TRIALS     : The number of trials to run
