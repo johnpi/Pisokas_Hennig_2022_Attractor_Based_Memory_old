@@ -34,7 +34,7 @@ USAGE
      TRIALS     : The number of trials to run
      NOISE      : The amount of neuronal noise (optional, default 2.3)
      VERSION    : The version code to use in the filenames (optional)
-     TAU_M      : The neuronal membrane time constant (optional, only used by the SIMPLE model)
+     TAU_M      : The neuronal membrane time constant in ms (optional, only used by the SIMPLE model)
 EOM
 )
 
@@ -86,6 +86,6 @@ if [ "${MODEL}" == "NMDA" ]; then
 fi
 
 if [ "${MODEL}" == "SIMPLE" ]; then
-   echo    "Running: python3 ./run_trials-simplified-neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
-   python3 ./run_trials-simplified-neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   echo    "Running: python3 ./run_trials-simplified-neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   python3 ./run_trials-simplified-neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
