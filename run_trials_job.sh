@@ -85,7 +85,7 @@ if [ "${MODEL}" == "NMDA" ]; then
    python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_NMDA_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
-if [ "${MODEL}" == "simple" ]; then
+if [ "${MODEL}" == "SIMPLE" ]; then
    echo    "Running: python3 ./run_trials-simplified-neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
    python3 ./run_trials-simplified-neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
