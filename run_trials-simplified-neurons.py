@@ -20,25 +20,25 @@ collected_data_file = 'Data/collected_drift_trials_v2.npy' # The file to store t
 def run_trials(num_of_trials         = 20, 
                collected_data_file   = 'Data/collected_drift_trials.npy', 
                stimulus_center_deg   = 180,
-               stimulus_width_deg    = 60,
-               stimulus_strength     = 0.5 * namp,
+               stimulus_width_deg    = 40,
+               stimulus_strength     = 2.0 * namp,
                t_stimulus_start      = 100 * ms,
                t_stimulus_duration   = 200 * ms,
                N_excitatory          = 1024,
                N_inhibitory          = 256,
                weight_scaling_factor = 2.0,
                sim_time_duration     = 10000. * ms,
-               t_window_width      = 200*ms,
-               snapshot_interval   = 100*ms,
+               t_window_width        = 200*ms,
+               snapshot_interval     = 100*ms,
                synaptic_noise_amount = 0.0,
                poisson_firing_rate   = 2.3 * Hz,
                
-               J_inhib2inhib    = 0.3 / 1000,
-               J_inhib2excit    = 0.3 / 1000,
-               Jpos_excit2excit = 0.3 / 1000,
-               J_excit2inhib    = 0.3 / 1000,
-               J_ext2inhib   = 1.0,
-               J_ext2excit   = 1.0, 
+               #J_inhib2inhib    = 0.3 / 1000,
+               #J_inhib2excit    = 0.3 / 1000,
+               #Jpos_excit2excit = 0.3 / 1000,
+               #J_excit2inhib    = 0.3 / 1000,
+               #J_ext2inhib   = 1.0,
+               #J_ext2excit   = 1.0, 
                tau_excit     = 20.0*ms, # Default is 20.0 * ms,
                tau_inhib     = 10.0*ms  # Default is 10.0 * ms
               ):
@@ -94,7 +94,8 @@ def run_trials(num_of_trials         = 20,
         if int(RAM_total) > RAM_available:                 # The int() is for removing the units
             mon_neurons_factor = RAM_available / RAM_total
             monitored_subset_size = int(monitored_subset_size * mon_neurons_factor)
-        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified.simulate_wm_simple(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, poisson_firing_rate=poisson_firing_rate, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size, J_inhib2inhib = J_inhib2inhib, J_inhib2excit = J_inhib2excit, Jpos_excit2excit=Jpos_excit2excit, J_excit2inhib = J_excit2inhib, J_ext2inhib = J_ext2inhib, J_ext2excit = J_ext2excit, tau_excit=tau_excit, tau_inhib=tau_inhib)
+        #rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified.simulate_wm_simple(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, poisson_firing_rate=poisson_firing_rate, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size, J_inhib2inhib = J_inhib2inhib, J_inhib2excit = J_inhib2excit, Jpos_excit2excit=Jpos_excit2excit, J_excit2inhib = J_excit2inhib, J_ext2inhib = J_ext2inhib, J_ext2excit = J_ext2excit, tau_excit=tau_excit, tau_inhib=tau_inhib)
+        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified.simulate_wm(N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, stimulus_strength=stimulus_strength, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, sim_time=sim_time_duration, synaptic_noise_amount = synaptic_noise_amount, monitored_subset_size = monitored_subset_size)
         
         t_snapshots = range(
             int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
