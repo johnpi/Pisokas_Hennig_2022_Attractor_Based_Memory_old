@@ -10,7 +10,8 @@ import argparse # For command line argument parsing
 import numpy as np
 from brian2 import *
 #from neurodynex.working_memory_network import wm_model
-from neurodynex.working_memory_network import wm_model_modified_simplified # Uses the simplified neuron model
+#from neurodynex.working_memory_network import wm_model_modified_simplified # Uses the simplified neuron model
+from neurodynex.working_memory_network import wm_model_modified
 
 from utility_functions import *
 
