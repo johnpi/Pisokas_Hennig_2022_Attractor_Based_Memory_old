@@ -41,7 +41,9 @@ def run_trials(num_of_trials         = 20,
                G_excit2inhib         = .35 * 1.2 * 0.292 * nS, # 14.73296054 / 4.
                G_extern2inhib        = 2.38 * nS,
                G_extern2excit        = 3.1 * nS,
-               Jpos_excit2excit      = 1.6
+               Jpos_excit2excit      = 1.6, 
+               
+               weights_skewness      = 0
               ):
     """
         Runs trials of the activity bump drift and collects corresponding time series
@@ -100,10 +102,10 @@ def run_trials(num_of_trials         = 20,
         if int(RAM_total) > RAM_available:                 # The int() is for removing the units
             mon_neurons_factor = RAM_available / RAM_total
             monitored_subset_size = int(monitored_subset_size * mon_neurons_factor)
-        rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified_EC_LV_principal.simulate_wm(sim_time=sim_time_duration, poisson_firing_rate=poisson_firing_rate, sigma_weight_profile=sigma_weight_profile, Jpos_excit2excit=Jpos_excit2excit, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_strength=stimulus_strength, G_inhib2inhib=G_inhib2inhib, G_inhib2excit=G_inhib2excit, G_excit2excit=G_excit2excit, G_excit2inhib=G_excit2inhib, G_extern2excit=G_extern2excit,
-            monitored_subset_size = monitored_subset_size,
-            synaptic_noise_amount = synaptic_noise_amount
-            )
+        if weights_skewness == 0:
+        	rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified_EC_LV_principal.simulate_wm(sim_time=sim_time_duration, poisson_firing_rate=poisson_firing_rate, sigma_weight_profile=sigma_weight_profile, Jpos_excit2excit=Jpos_excit2excit, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_strength=stimulus_strength, G_inhib2inhib=G_inhib2inhib, G_inhib2excit=G_inhib2excit, G_excit2excit=G_excit2excit, G_excit2inhib=G_excit2inhib, G_extern2excit=G_extern2excit, monitored_subset_size = monitored_subset_size, synaptic_noise_amount = synaptic_noise_amount)
+    	else:
+    		rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified_EC_LV_principal.simulate_wm_skewed(sim_time=sim_time_duration, poisson_firing_rate=poisson_firing_rate, sigma_weight_profile=sigma_weight_profile, Jpos_excit2excit=Jpos_excit2excit, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_strength=stimulus_strength, G_inhib2inhib=G_inhib2inhib, G_inhib2excit=G_inhib2excit, G_excit2excit=G_excit2excit, G_excit2inhib=G_excit2inhib, G_extern2excit=G_extern2excit, monitored_subset_size = monitored_subset_size, synaptic_noise_amount = synaptic_noise_amount, weights_skewness = weights_skewness)
         
         t_snapshots = range(
             int(math.floor((t_stimulus_start+t_stimulus_duration)/ms)),  # lower bound
@@ -233,7 +235,7 @@ def explore_noise_levels():
                       )
 
 # Collect data for different network sizes, noise levels, and stimulus headings
-def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, neuronal_noise_Hz, stim_heading_degrees_list, N_trials, sim_time_duration, available_RAM, filename):
+def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, neuronal_noise_Hz, stim_heading_degrees_list, N_trials, sim_time_duration, available_RAM, weights_skewness, filename):
     for i, Ne in enumerate(N_excitatory_neurons_list):
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
@@ -275,7 +277,8 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, n
                                        G_extern2inhib        = G_extern2inhib * nS,
                                        G_extern2excit        = G_extern2excit * nS,
                                        stimulus_strength     = stimulus_strength * namp,
-                                       available_RAM         = available_RAM
+                                       available_RAM         = available_RAM, 
+                                       weights_skewness      = weights_skewness
                                       )
                         else:
                             print('ERROR: Parameter values not right.')
@@ -322,6 +325,9 @@ parser.add_argument('-a', '--available-RAM', type=int, dest='available_RAM', def
 # File to append collected results to
 parser.add_argument('-f', '--file', type=str, dest='filename', required=True, 
                    help='Filename to append collected results to.')
+# Make the excitatory synaptic connectivity skewed gaussian (Default 0: symmetric gaussian)
+parser.add_argument('-s', '--weights-skewness', type=int, dest='weights_skewness', default=0,
+                   help='Amound of bias to the Gaussian distribution of the excitatory synaptic weights. Default 0: no skewing. The parameter is the a value in the skewnorm.pdf() function. Valid values are floats. Negative values cause skeweness towards the left side positive towards the right side.')
 
 # Parse the command line arguments
 args = parser.parse_args()
@@ -334,6 +340,7 @@ N_trials = args.trials
 duration = args.duration
 filename = args.filename
 available_RAM = args.available_RAM
+weights_skewness = args.weights_skewness
 
 # Run trials
 explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list, 
@@ -343,4 +350,5 @@ explore_spec_setups(N_excitatory_neurons_list=N_neurons_exc_list,
                     N_trials = N_trials,
                     sim_time_duration = duration * 1000. * ms,
                     available_RAM = available_RAM,
+                    weights_skewness = weights_skewness, 
                     filename = filename)

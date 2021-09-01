@@ -5,6 +5,7 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 
 # Load libraries
 import sys
+import os
 import argparse # For command line argument parsing
 import math
 import numpy as np
@@ -13,6 +14,7 @@ import glob
 from utility_functions import *
 from Python_Libs.utility_functions import *
 
+DEBUG = False
 
 def dispertion_of_absolute_deviation(expected_value, time_series_list):
     """
@@ -72,8 +74,11 @@ def pick_time_series_list(collected_data_file,
     else:
         collected_data_files = collected_data_file
     
+    if not DEBUG: print('      ', end='')
     for collected_data_file in collected_data_files:
-        print('      Processing file:', collected_data_file)
+        if DEBUG: print('      Processing file:', collected_data_file)
+        print('.', end='')
+        sys.stdout.flush()
         # Try to load existing data if any otherwise create an empty collection
         try:
             #collected_trials_data = np.load(collected_data_file, allow_pickle=True, encoding='bytes')
@@ -92,7 +97,7 @@ def pick_time_series_list(collected_data_file,
             print('      Exception while running pick_data_samples()')
             collected_trials_data = np.array([]) # Collected trials data records list
         
-        print('        Got len(collected_trials_data)', len(collected_trials_data))
+        if DEBUG: print('        Got len(collected_trials_data)', len(collected_trials_data))
         
         # We use enumerate to add a count to the iterated items of the iterator
         for i, item in enumerate(collected_trials_data):
@@ -162,7 +167,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
     num_of_plot_keys = len(plot_keys_list)
 
     for i,plot_key in enumerate(plot_keys_list):
-        print('    Look for N_excitatory', plot_key)
+        print('    Look for N_excitatory =', plot_key)
         plot_item = pick_time_series_list(collected_data_file, 
                                           stimulus_center_deg   = stimulus_center_deg,
                                           stimulus_width_deg    = None,
@@ -182,7 +187,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
 
 
 
-def merge_file(output_file):
+def merge_file(output_file, input_directory, unwrap_angles, filename_template):
     """
         Reads and combines all the data records from multiple files 
         and stores them in a new file.
@@ -194,15 +199,31 @@ def merge_file(output_file):
     
     collected_trials_data = {} # Collected trials data records list
 
-    path = './Data/'
-    path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
-    path = '/exports/eddie/scratch/s0093128/Data/Backup/'
-    collected_data_file_pattern = path + 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
-    models_list           = ['NMDA', 'EC_LV_1']
-    neurons_num_list      = [128, 256, 512, 1024, 2048, 4096, 8192]
-    #neurons_num_list      = [256, 8192]
-    poisson_firing_rate   = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
-    #poisson_firing_rate   = [0.001, 0.002]
+    #path = './Data/'
+    #path = '/Volumes/WD Elements 25A3 Media/Documents/Research/PhD/Projects/Recurrent_Net_Memory/Attractor_Based_Memory_Plaussibility_Study/Data/Completed/'
+    #path = '/exports/eddie/scratch/s0093128/Data/Backup/'
+    path = input_directory
+    
+    # WARNING: Need to choose and uncomment one of these the rest is handled accordingly
+    # Now selected from the command line
+    if filename_template == 1:
+    	filename_template = 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
+    elif filename_template == 2:
+    	filename_template = 'collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy'
+    else:
+    	print('ERROR: Not acceptable value given filename_template=', filename_template)
+    	exit(1)
+    
+    collected_data_file_pattern = os.path.join(path, filename_template)
+    
+    models_list               = ['NMDA', 'EC_LV_1']
+    neurons_num_list          = [128, 256, 512, 1024, 2048, 4096, 8192]
+    poisson_firing_rate       = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+    if 'tau{:}' in filename_template:
+        models_list           = ['SIMPLE']
+        neuron_time_constants = ['10ms', '50ms', '100ms', '500ms', '1000ms', '5000ms', '10000ms', '50000ms', '100000ms']
+    else:
+        neuron_time_constants = ['complex']
     stimulus_center_deg   = 180
     synaptic_noise_amount = 0
     
@@ -213,19 +234,26 @@ def merge_file(output_file):
         # For each neuronal noise level
         for poisson_neuron_noise in poisson_firing_rate:
             print('  poisson_neuron_noise', poisson_neuron_noise)
-            print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
-            collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
-            print('  Found {:} files.'.format(collected_data_file_list))
+            collected_trials_data[model][poisson_neuron_noise] = {}
+            for neuron_time_constant in neuron_time_constants:
+                if 'tau{:}' in filename_template:
+                    print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*')))
+                    collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*'))
+                else:
+                    print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
+                    collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
+                if DEBUG: print('  Found {:} files.'.format(collected_data_file_list))
+                print('  Found {:} files.'.format(len(collected_data_file_list)))
             
-            print('  Call pick_net_size_data()')
-            plot_items_dict = pick_net_size_data(collected_data_file_list, 
-                                                 neurons_num_list, 
-                                                 stimulus_center_deg = stimulus_center_deg, 
-                                                 synaptic_noise_amount = synaptic_noise_amount,
-                                                 unwrap_modulo_angles = True)
+                if DEBUG: print('  Call pick_net_size_data()')
+                plot_items_dict = pick_net_size_data(collected_data_file_list, 
+                                                     neurons_num_list, 
+                                                     stimulus_center_deg = stimulus_center_deg, 
+                                                     synaptic_noise_amount = synaptic_noise_amount,
+                                                     unwrap_modulo_angles = unwrap_angles)
             
-            # This is a dict with structure ['NMDA|EC_LV_1']['0.001']['1024'] = time_series_collection
-            collected_trials_data[model][poisson_neuron_noise] = plot_items_dict
+                # This is a dict with structure ['NMDA|EC_LV_1'][0.001]['complex|10ms']['1024'] = time_series_collection
+                collected_trials_data[model][poisson_neuron_noise][neuron_time_constant] = plot_items_dict
         
     # Save all data in the file
     np.save(output_file, collected_trials_data, allow_pickle=True)
@@ -236,8 +264,14 @@ def merge_file(output_file):
 parser = argparse.ArgumentParser(description='Merge the items of the ndarrays in the provided collect data files into one file.')
 
 # File to write all data to
-parser.add_argument('-f', '--file', type=str, dest='output_file', required=True,
-                   help='Output filename to write all collected data to.')
+parser.add_argument('-o', '--output-file', type=str, dest='output_file', required=True,
+                   help='Output filename to write all combined data to.')
+parser.add_argument('-i', '--input-directory', type=str, dest='input_directory', required=True,
+help='One directory path to .npy files to read data from and combine them into the output file.')
+parser.add_argument('-u', '--unwrap-angles', action='store_true', dest='unwrap_angles', required=False, default=False,
+help='Switch: If provided heading angles are unwrapped using modulo 360 so after 360 is 361 and so on. Default is to not unwrap heading values so after 360 is 0.')
+parser.add_argument('-t', '--filename-template', type=int, dest='filename_template', required=True, choices=[1, 2], 
+help='Specifies the filename template to use:\n 1 for "collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy"\n 2 for "collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy"')
 #parser.add_argument('-i', '--input-files', type=str, nargs='+', dest='input_files', required=True,
 #help='One or more filename of .npy files to read data from and combine them into one output file.')
 #parser.add_argument('-m', '--max', type=int, dest='max_entities', required=False, default=None,
@@ -247,9 +281,12 @@ parser.add_argument('-f', '--file', type=str, dest='output_file', required=True,
 args = parser.parse_args()
 
 #input_files = args.input_files
+input_directory = args.input_directory
 output_file = args.output_file
 #max_entities = args.max_entities
+unwrap_angles = args.unwrap_angles
+filename_template = args.filename_template
 
 # Was
 # merge_file(merged_data_filename, collected_data_files_list)
-merge_file(output_file)
+merge_file(output_file, input_directory, unwrap_angles, filename_template)
