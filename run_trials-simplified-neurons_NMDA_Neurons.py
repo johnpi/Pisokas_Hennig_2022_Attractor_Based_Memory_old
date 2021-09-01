@@ -322,12 +322,12 @@ parser.add_argument('-D', '--duration', type=int, dest='duration', default=10,
 # How much available RAM there is for the process to use
 parser.add_argument('-a', '--available-RAM', type=int, dest='available_RAM', default=32e9,
                    help='Amound of available RAM for the simulation in Bytes.')
+# Make the excitatory synaptic connectivity skewed gaussian (Default 0: symmetric gaussian)
+parser.add_argument('-s', '--weights-skewness', type=float, dest='weights_skewness', default=0,
+                   help='Amound of bias to the Gaussian distribution of the excitatory synaptic weights. It causes systematic activity bump shift. Default 0: no skewing. The parameter is the a value in the skewnorm.pdf() function. Valid values are floats. Negative values cause skeweness towards the left side positive towards the right side.')
 # File to append collected results to
 parser.add_argument('-f', '--file', type=str, dest='filename', required=True, 
                    help='Filename to append collected results to.')
-# Make the excitatory synaptic connectivity skewed gaussian (Default 0: symmetric gaussian)
-parser.add_argument('-s', '--weights-skewness', type=int, dest='weights_skewness', default=0,
-                   help='Amound of bias to the Gaussian distribution of the excitatory synaptic weights. It causes systematic activity bump shift. Default 0: no skewing. The parameter is the a value in the skewnorm.pdf() function. Valid values are floats. Negative values cause skeweness towards the left side positive towards the right side.')
 
 # Parse the command line arguments
 args = parser.parse_args()
