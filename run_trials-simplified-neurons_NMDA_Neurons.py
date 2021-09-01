@@ -327,7 +327,7 @@ parser.add_argument('-f', '--file', type=str, dest='filename', required=True,
                    help='Filename to append collected results to.')
 # Make the excitatory synaptic connectivity skewed gaussian (Default 0: symmetric gaussian)
 parser.add_argument('-s', '--weights-skewness', type=int, dest='weights_skewness', default=0,
-                   help='Amound of bias to the Gaussian distribution of the excitatory synaptic weights. Default 0: no skewing. The parameter is the a value in the skewnorm.pdf() function. Valid values are floats. Negative values cause skeweness towards the left side positive towards the right side.')
+                   help='Amound of bias to the Gaussian distribution of the excitatory synaptic weights. It causes systematic activity bump shift. Default 0: no skewing. The parameter is the a value in the skewnorm.pdf() function. Valid values are floats. Negative values cause skeweness towards the left side positive towards the right side.')
 
 # Parse the command line arguments
 args = parser.parse_args()

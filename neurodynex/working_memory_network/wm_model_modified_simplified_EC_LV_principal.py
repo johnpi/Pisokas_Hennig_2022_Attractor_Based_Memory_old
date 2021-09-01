@@ -536,7 +536,8 @@ def simulate_wm_skewed(
     G_extern2excit = 3.1 * b2.nS, # Temp for testing
     monitored_subset_size=1024, sim_time=800. * b2.ms,
     synaptic_noise_amount=0.0,
-    weights_skewness = 0.0 # Default 0 no skewness, equal normal distribution. It is the a parameter of the skewnorm.pdf fucntion):
+    weights_skewness = 0.0 # Default 0 no skewness, results in normal distribution. Causes systematic shift of the activity bump. It is the value for the a parameter of the skewnorm.pdf fucntion
+    ):
     """
     Args:
         N_excitatory (int): Size of the excitatory population

@@ -57,7 +57,7 @@ TRIALS=${4}              # $4 : the number of trials to run
 NOISE=${5:-${NOISE}}     # $5 : the amount of neuronal noise (optional, default 2.3)
 VERSION=${6:-${VERSION}} # $6 : the version code to use in the filenames (optional)
 TAU_M=${7:-${TAU_MEM}}   # $7 : the neuronal membrane time constant in ms (optional, only used by the SIMPLE model)
-SKEW_W=${8:-${SKEW_W}}   # $8 : the amount of skewing of the Gaussian distribution of excitatory synaptic weights (optional, only used by the NMDA-SHIFT model, and if provided both TAU_M and SKEW_W must be provided even though the TAU_M will be ignored but needed for the positional variable assignment. Default 0.05: small skewing towards the right)
+SKEW_W=${8:-${SKEW_W}}   # $8 : the amount of skewing of the Gaussian distribution of excitatory synaptic weights that causes shift of the activity bump (optional, only used by the NMDA-SHIFT model, and if provided both TAU_M and SKEW_W must be provided even though the TAU_M will be ignored but needed for the positional variable assignment. Default 0.05: small skewing towards the right)
 
 # Initialise the environment modules
 . /etc/profile.d/modules.sh

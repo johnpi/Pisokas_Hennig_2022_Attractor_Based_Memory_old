@@ -328,7 +328,7 @@ def simulate_wm_skewed(
         synaptic_noise_amount=0.0,
         tau_excit     = None, # Default is 20.0 * b2.ms (tau_excit needs to be higher than tau_inhib for bump maintenance)
         tau_inhib     = None, # Default is 10.0 * b2.ms
-        weights_skewness = 0 # Default 0 no skewness, equal normal distribution. It is the a parameter of the skewnorm.pdf() function
+        weights_skewness = 0 # Default 0 no skewness, results in normal distribution. Causes systematic shift of the activity bump. It is the value for the a parameter of the skewnorm.pdf fucntion
     ):
     """
     Args:
