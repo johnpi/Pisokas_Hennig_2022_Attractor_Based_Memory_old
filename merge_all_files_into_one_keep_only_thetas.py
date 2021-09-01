@@ -187,7 +187,7 @@ def pick_net_size_data(collected_data_file, N_excitatory_list, stimulus_center_d
 
 
 
-def merge_file(output_file, input_directory, unwrap_angles, filename_template):
+def merge_file(output_file, input_directory, unwrap_angles, filename_template_n):
     """
         Reads and combines all the data records from multiple files 
         and stores them in a new file.
@@ -205,10 +205,12 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template):
     path = input_directory
     
     # Now selected from the command line
-    if filename_template == 1 or filename_template == 3: # Process files containing ['NMDA', 'EC_LV_1', 'NMDA-SHIFT'] simulations
+    if filename_template_n == 1 or filename_template_n == 3: # Process files containing ['NMDA', 'EC_LV_1'] simulations
         filename_template = 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
-    elif filename_template == 2: # Process files containing ['SIMPLE'] simulations
+    elif filename_template_n == 2: # Process files containing ['SIMPLE'] simulations
         filename_template = 'collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy'
+    elif filename_template_n == 3: # Process files containing ['NMDA-SHIFT'] simulations
+        filename_template = 'collected_drift_trials_all_{:}*_duration300s_noise{:}Hz_veddie*_{:}.npy'
     else:
         print('ERROR: Not acceptable value given filename_template=', filename_template)
         exit(1)
@@ -221,13 +223,13 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template):
     models_list               = ['NMDA', 'EC_LV_1']
     neuron_time_constants     = ['complex']
     # Then modify if filename_template parameter is given
-    if filename_template   == 1: # Process files containing ['NMDA', 'EC_LV_1'] simulations
+    if filename_template_n   == 1: # Process files containing ['NMDA', 'EC_LV_1'] simulations
         models_list           = ['NMDA', 'EC_LV_1']
         neuron_time_constants = ['complex']
-    elif filename_template == 2: # Process files containing ['SIMPLE'] simulations
+    elif filename_template_n == 2: # Process files containing ['SIMPLE'] simulations
         models_list           = ['SIMPLE']
-        neuron_time_constants = ['10ms', '50ms', '100ms', '500ms', '1000ms', '5000ms', '10000ms', '50000ms', '100000ms']
-    elif filename_template == 3: # Process files containing ['NMDA-SHIFT'] simulations (NMDA with bump shifting)
+        neuron_time_constants = ['1ms', '10ms', '50ms', '100ms', '500ms', '1000ms', '5000ms', '10000ms', '50000ms', '100000ms']
+    elif filename_template_n == 3: # Process files containing ['NMDA-SHIFT'] simulations (NMDA with bump shifting)
         models_list           = ['NMDA-SHIFT']
         neuron_time_constants = ['complex']
     else:
@@ -245,7 +247,7 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template):
             print('  poisson_neuron_noise', poisson_neuron_noise)
             collected_trials_data[model][poisson_neuron_noise] = {}
             for neuron_time_constant in neuron_time_constants:
-                if filename_template == 2: # Process files containing ['SIMPLE'] simulations
+                if filename_template_n == 2: # Process files containing ['SIMPLE'] simulations
                     print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*')))
                     collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*'))
                 else: # Process files containing ['NMDA', 'EC_LV_1', 'NMDA-SHIFT'] simulations
