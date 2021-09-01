@@ -204,26 +204,35 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template):
     #path = '/exports/eddie/scratch/s0093128/Data/Backup/'
     path = input_directory
     
-    # WARNING: Need to choose and uncomment one of these the rest is handled accordingly
     # Now selected from the command line
-    if filename_template == 1:
-    	filename_template = 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
-    elif filename_template == 2:
-    	filename_template = 'collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy'
+    if filename_template == 1 or filename_template == 3: # Process files containing ['NMDA', 'EC_LV_1', 'NMDA-SHIFT'] simulations
+        filename_template = 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
+    elif filename_template == 2: # Process files containing ['SIMPLE'] simulations
+        filename_template = 'collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy'
     else:
-    	print('ERROR: Not acceptable value given filename_template=', filename_template)
-    	exit(1)
+        print('ERROR: Not acceptable value given filename_template=', filename_template)
+        exit(1)
     
     collected_data_file_pattern = os.path.join(path, filename_template)
     
-    models_list               = ['NMDA', 'EC_LV_1']
+    # Default values
     neurons_num_list          = [128, 256, 512, 1024, 2048, 4096, 8192]
     poisson_firing_rate       = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
-    if 'tau{:}' in filename_template:
+    models_list               = ['NMDA', 'EC_LV_1']
+    neuron_time_constants     = ['complex']
+    # Then modify if filename_template parameter is given
+    if filename_template   == 1: # Process files containing ['NMDA', 'EC_LV_1'] simulations
+        models_list           = ['NMDA', 'EC_LV_1']
+        neuron_time_constants = ['complex']
+    elif filename_template == 2: # Process files containing ['SIMPLE'] simulations
         models_list           = ['SIMPLE']
         neuron_time_constants = ['10ms', '50ms', '100ms', '500ms', '1000ms', '5000ms', '10000ms', '50000ms', '100000ms']
-    else:
+    elif filename_template == 3: # Process files containing ['NMDA-SHIFT'] simulations (NMDA with bump shifting)
+        models_list           = ['NMDA-SHIFT']
         neuron_time_constants = ['complex']
+    else:
+        pass
+    
     stimulus_center_deg   = 180
     synaptic_noise_amount = 0
     
@@ -236,10 +245,10 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template):
             print('  poisson_neuron_noise', poisson_neuron_noise)
             collected_trials_data[model][poisson_neuron_noise] = {}
             for neuron_time_constant in neuron_time_constants:
-                if 'tau{:}' in filename_template:
+                if filename_template == 2: # Process files containing ['SIMPLE'] simulations
                     print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*')))
                     collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, neuron_time_constant, poisson_neuron_noise, '*'))
-                else:
+                else: # Process files containing ['NMDA', 'EC_LV_1', 'NMDA-SHIFT'] simulations
                     print('  Get matching files: {:}'.format(collected_data_file_pattern.format(model, poisson_neuron_noise, '*')))
                     collected_data_file_list = glob.glob(collected_data_file_pattern.format(model, poisson_neuron_noise, '*'))
                 if DEBUG: print('  Found {:} files.'.format(collected_data_file_list))
@@ -270,8 +279,8 @@ parser.add_argument('-i', '--input-directory', type=str, dest='input_directory',
 help='One directory path to .npy files to read data from and combine them into the output file.')
 parser.add_argument('-u', '--unwrap-angles', action='store_true', dest='unwrap_angles', required=False, default=False,
 help='Switch: If provided heading angles are unwrapped using modulo 360 so after 360 is 361 and so on. Default is to not unwrap heading values so after 360 is 0.')
-parser.add_argument('-t', '--filename-template', type=int, dest='filename_template', required=True, choices=[1, 2], 
-help='Specifies the filename template to use:\n 1 for "collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy"\n 2 for "collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy"')
+parser.add_argument('-t', '--filename-template', type=int, dest='filename_template', required=True, choices=[1, 2, 3], 
+help='Specifies the filename template to use:\n 1 for "collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy"\n 2 for "collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy"\n 3 for "collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy" with model NMDA-SHIFT')
 #parser.add_argument('-i', '--input-files', type=str, nargs='+', dest='input_files', required=True,
 #help='One or more filename of .npy files to read data from and combine them into one output file.')
 #parser.add_argument('-m', '--max', type=int, dest='max_entities', required=False, default=None,

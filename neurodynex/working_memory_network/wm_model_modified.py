@@ -454,7 +454,7 @@ def simulate_wm_skewed(
     #      (Jpos_excit2excit - Jneg_excit2excit) *
     #      math.exp(-.5 * (360. * min(j, N_excitatory - j) / N_excitatory) ** 2 / sigma_weight_profile ** 2))
     #     for j in range(N_excitatory)]
-	# with this
+    # with this
     y02 = numpy.array([skewnorm.pdf((360. * (j - N_excitatory / 2) / N_excitatory), a=weights_skewness, loc=0, scale=sigma_weight_profile) for j in range(N_excitatory)])
     y02 = Jneg_excit2excit + (Jpos_excit2excit - Jneg_excit2excit) * y02/numpy.max(y02) # Normalise to 0-1
     fft_presyn_weight_kernel_02 = rfft(y02)
