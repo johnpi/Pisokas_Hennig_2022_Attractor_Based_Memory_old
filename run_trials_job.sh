@@ -23,7 +23,8 @@ vmem=16000000000 # Available RAM in Bytes
 VERSION="eddie02"
 NOISE="2.3"
 TAU_MEM="10"
-SKEW_W="0.05"
+SKEW_W="0.05"  # results in 180deg shift per ~10s
+SKEW_W="0.005" # results in 180deg shift per ~??s
 
 # Usage string
 USAGE=$(cat <<- EOM
