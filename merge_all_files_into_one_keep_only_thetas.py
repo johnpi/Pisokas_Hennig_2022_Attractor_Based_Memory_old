@@ -205,12 +205,13 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template_n)
     path = input_directory
     
     # Now selected from the command line
-    if filename_template_n == 1 or filename_template_n == 3: # Process files containing ['NMDA', 'EC_LV_1'] simulations
+    if filename_template_n == 1: # Process files containing ['NMDA', 'EC_LV_1'] simulations
         filename_template = 'collected_drift_trials_all_{:}_duration300s_noise{:}Hz_veddie*_{:}.npy'
     elif filename_template_n == 2: # Process files containing ['SIMPLE'] simulations
         filename_template = 'collected_drift_trials_all_{:}_duration300s_tau{:}_noise{:}Hz_veddie*_{:}.npy'
     elif filename_template_n == 3: # Process files containing ['NMDA-SHIFT'] simulations
         filename_template = 'collected_drift_trials_all_{:}*_duration300s_noise{:}Hz_veddie*_{:}.npy'
+        filename_template = 'collected_drift_trials_all_{:}*_duration60s_noise{:}Hz_veddie*_{:}.npy'
     else:
         print('ERROR: Not acceptable value given filename_template=', filename_template)
         exit(1)
@@ -227,10 +228,16 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template_n)
         models_list           = ['NMDA', 'EC_LV_1']
         neuron_time_constants = ['complex']
     elif filename_template_n == 2: # Process files containing ['SIMPLE'] simulations
+        neurons_num_list      = [256]
+        poisson_firing_rate   = [0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.005, 0.010, 0.100]
+        poisson_firing_rate   = [1.0]
         models_list           = ['SIMPLE']
-        neuron_time_constants = ['1ms', '10ms', '50ms', '100ms', '500ms', '1000ms', '5000ms', '10000ms', '50000ms', '100000ms']
+        models_list           = ['SIMPLE-TAU2']
+        neuron_time_constants = ['10ms', '100ms', '1000ms', '10000ms', '100000ms']
+        neuron_time_constants = ['1ms', '10ms', '100ms']
     elif filename_template_n == 3: # Process files containing ['NMDA-SHIFT'] simulations (NMDA with bump shifting)
         models_list           = ['NMDA-SHIFT']
+        models_list           = ['NMDA-SHIFT-0.001', 'NMDA-SHIFT-0.0005', 'NMDA-SHIFT-0.0001', 'NMDA-SHIFT-0.00001']
         neuron_time_constants = ['complex']
     else:
         pass

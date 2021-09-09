@@ -91,11 +91,19 @@ if [ "${MODEL}" == "NMDA" ]; then
    python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_NMDA_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
+# The membrane time constant is changed using capacitance = tau * conductance
+if [ "${MODEL}" == "NMDA-TAU" ]; then
+   echo    "Running: python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -a ${vmem} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_NMDA-TAU_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   python3 ./run_trials-simplified-neurons_NMDA_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -a "${vmem}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_NMDA-TAU_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+fi
+
+
 if [ "${MODEL}" == "SIMPLE" ]; then
    echo    "Running: python3 ./run_trials-simplified-neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
    python3 ./run_trials-simplified-neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
+# Unlike "SIMPLE" that uses conductance = capacitance / tau this uses capacitance = tau * conductance
 if [ "${MODEL}" == "SIMPLE-TAU2" ]; then
    echo    "Running: python3 ./run_trials-simplified-neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} --tau_m ${TAU_M} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE-TAU2_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
    python3 ./run_trials-simplified-neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" --tau_m "${TAU_M}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_SIMPLE-TAU2_duration${DURATION}s_tau${TAU_M}ms_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
