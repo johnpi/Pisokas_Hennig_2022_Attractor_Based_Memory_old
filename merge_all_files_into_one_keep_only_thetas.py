@@ -231,10 +231,12 @@ def merge_file(output_file, input_directory, unwrap_angles, filename_template_n)
         neurons_num_list      = [256]
         poisson_firing_rate   = [0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.005, 0.010, 0.100]
         poisson_firing_rate   = [1.0]
+        poisson_firing_rate   = [1.4]
         models_list           = ['SIMPLE']
         models_list           = ['SIMPLE-TAU2']
+        models_list           = ['NMDA-TAU']
         neuron_time_constants = ['10ms', '100ms', '1000ms', '10000ms', '100000ms']
-        neuron_time_constants = ['1ms', '10ms', '100ms']
+        neuron_time_constants = ['1ms', '5ms', '10ms', '50ms', '100ms']
     elif filename_template_n == 3: # Process files containing ['NMDA-SHIFT'] simulations (NMDA with bump shifting)
         models_list           = ['NMDA-SHIFT']
         models_list           = ['NMDA-SHIFT-0.001', 'NMDA-SHIFT-0.0005', 'NMDA-SHIFT-0.0001', 'NMDA-SHIFT-0.00001']

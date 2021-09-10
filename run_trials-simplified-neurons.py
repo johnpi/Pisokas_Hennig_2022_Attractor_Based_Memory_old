@@ -276,7 +276,7 @@ parser.add_argument('--neuronal_noise_Hz', type=float, dest='neuronal_noise_Hz',
 parser.add_argument('--heading', type=int, nargs='+', dest='headings', default=[180], 
                    help='One or more integer numbers specifying the stimulus heading to use.')
 # Specify the time constant of the membrane tau=R*C
-parser.add_argument('--tau_m', type=int, nargs='+', dest='tau_m', default=[10], 
+parser.add_argument('--tau_m', type=float, nargs='+', dest='tau_m', default=[10], 
                    help='One or more integer numbers specifying the time constant of the membrane tau=R*C. The simulation will be run for each value given. Default is tau=10[ms]')
 # How many trials to run for each condition
 parser.add_argument('-t', '--trials', type=int, dest='trials', default=20, 

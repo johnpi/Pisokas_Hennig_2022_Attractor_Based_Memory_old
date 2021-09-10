@@ -22,7 +22,7 @@ vmem=16000000000 # Available RAM in Bytes
 # Defaults for optional parameters
 VERSION="eddie02"
 NOISE="2.3"
-TAU_MEM="10"
+TAU_MEM="-1"   # Default is an invalid number that is ignored by scripts
 SKEW_W="0.05"  # results in 180deg shift per ~10s
 SKEW_W="0.005" # results in 180deg shift per ~??s
 
@@ -37,7 +37,7 @@ USAGE
      TRIALS     : The number of trials to run
      NOISE      : The amount of neuronal noise (optional, default 2.3)
      VERSION    : The version code to use in the filenames (optional)
-     TAU_M      : The neuronal membrane time constant in ms (optional, only used by the SIMPLE model)
+     TAU_M      : The neuronal membrane time constant in ms (optional, not used by all model, default -1 an invalid value that is ignored)
      SKEW_W     : The amount of skewing of the Gaussian distribution of excitatory synaptic weights (optional, only used by the NMDA-SHIFT model, and if provided both TAU_M and SKEW_W must be provided even though the TAU_M will be ignored but needed for the positional variable assignment. Default 0.05: small skewing towards the right)
 EOM
 )
@@ -72,12 +72,12 @@ conda activate Brian2
 
 # Run the program
 if [ "${MODEL}" == "reduced" ]; then
-   echo	"Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} -a ${vmem} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_reduced_2_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   echo    "Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} -a ${vmem} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_reduced_2_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
    python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons_reduced_2.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_reduced_2_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
 if [ "${MODEL}" == "full" ]; then
-   echo	"Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} -a ${vmem} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
+   echo    "Running: python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N ${NEURONS} -t ${TRIALS} -D ${DURATION} --neuronal_noise_Hz ${NOISE} -a ${vmem} -f /exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
    python3 ./run_trials-simplified-neurons_EC_LV_Principal_Neurons.py -N "${NEURONS}" -t "${TRIALS}" -D "${DURATION}" --neuronal_noise_Hz "${NOISE}" -a "${vmem}" -f "/exports/eddie/scratch/s0093128/Data/collected_drift_trials_all_EC_LV_duration${DURATION}s_noise${NOISE}Hz_v${VERSION}_${NEURONS}.npy"
 fi
 
