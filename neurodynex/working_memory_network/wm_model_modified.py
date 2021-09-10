@@ -602,8 +602,8 @@ def simulate_wm_tau(
         G_excit2inhib=.35 * 1.2 * 0.292 * b2.nS,
         monitored_subset_size=1024, sim_time=800. * b2.ms,
         synaptic_noise_amount=0.0,
-        tau_excit     = None, # Default is 20.0 * b2.ms (tau_excit needs to be higher than tau_inhib for bump maintenance)
-        tau_inhib     = None  # Default is 10.0 * b2.ms
+        tau_excit     = None, 
+        tau_inhib     = None  
     ):
     """
     Args:
@@ -663,6 +663,7 @@ def simulate_wm_tau(
     if tau_excit is not None:
         #G_leak_excit = Cm_excit / tau_excit
         Cm_excit = tau_excit * G_leak_excit
+
     # specify the weight profile in the recurrent population
     # std-dev of the gaussian weight profile around the prefered direction
     # sigma_weight_profile = 12.0  # std-dev of the gaussian weight profile around the prefered direction

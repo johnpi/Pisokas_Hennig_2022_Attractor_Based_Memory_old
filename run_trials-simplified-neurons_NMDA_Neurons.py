@@ -107,7 +107,7 @@ def run_trials(num_of_trials         = 20,
         if weights_skewness == 0:
             rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified_EC_LV_principal.simulate_wm(sim_time=sim_time_duration, poisson_firing_rate=poisson_firing_rate, sigma_weight_profile=sigma_weight_profile, Jpos_excit2excit=Jpos_excit2excit, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_strength=stimulus_strength, G_inhib2inhib=G_inhib2inhib, G_inhib2excit=G_inhib2excit, G_excit2excit=G_excit2excit, G_excit2inhib=G_excit2inhib, G_extern2excit=G_extern2excit, monitored_subset_size = monitored_subset_size, synaptic_noise_amount = synaptic_noise_amount, tau_excit=tau_excit, tau_inhib=tau_inhib)
         else:
-        	# This one ignores tau_excit and tau_inhib
+            # This one ignores tau_excit and tau_inhib
             rate_monitor_excit, spike_monitor_excit, voltage_monitor_excit, idx_monitored_neurons_excit, rate_monitor_inhib, spike_monitor_inhib, voltage_monitor_inhib, idx_monitored_neurons_inhib, w_profile = wm_model_modified_simplified_EC_LV_principal.simulate_wm_skewed(sim_time=sim_time_duration, poisson_firing_rate=poisson_firing_rate, sigma_weight_profile=sigma_weight_profile, Jpos_excit2excit=Jpos_excit2excit, t_stimulus_start=t_stimulus_start, t_stimulus_duration=t_stimulus_duration, stimulus_center_deg=stimulus_center_deg, stimulus_width_deg=stimulus_width_deg, N_excitatory=N_excitatory, N_inhibitory=N_inhibitory, weight_scaling_factor=weight_scaling_factor, stimulus_strength=stimulus_strength, G_inhib2inhib=G_inhib2inhib, G_inhib2excit=G_inhib2excit, G_excit2excit=G_excit2excit, G_excit2inhib=G_excit2inhib, G_extern2excit=G_extern2excit, monitored_subset_size = monitored_subset_size, synaptic_noise_amount = synaptic_noise_amount, weights_skewness = weights_skewness)
         
         t_snapshots = range(
@@ -139,9 +139,9 @@ def run_trials(num_of_trials         = 20,
         collected_data['weight_scaling_factor'] = weight_scaling_factor
         collected_data['synaptic_noise_amount'] = synaptic_noise_amount
         if tau_excit is not None:
-        	collected_data['tau_excit'] = tau_excit
+            collected_data['tau_excit'] = tau_excit
         if tau_inhib is not None:
-        	collected_data['tau_inhib'] = tau_inhib
+            collected_data['tau_inhib'] = tau_inhib
 
         # Data
         #collected_data['rate_monitor_excit'] = rate_monitor_excit
@@ -245,59 +245,59 @@ def explore_spec_setups(N_excitatory_neurons_list, synaptic_noise_amount_list, n
         for stim_heading_degrees in stim_heading_degrees_list:
             for synaptic_noise_amount in synaptic_noise_amount_list:
                 for tau_membrane in tau_membrane_list:
-					for trial in range(1, N_trials+1):
-						# If the provided tau value is valid 
-						if tau_membrane is not None and tau_membrane > 0:
-							tau_excit = tau_membrane * ms
-							tau_inhib = tau_membrane * ms / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
-						else: # If not a valid set it to None so it is ignored
-							tau_excit = None
-							tau_inhib = None
-						
-						print('Trial {:3} with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
-								trial,
-								Ne,
-								stim_heading_degrees,
-								synaptic_noise_amount))
-						network_param = network_parameters_dict.get(Ne)
-						if network_param is None:
-							print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
-						else:
-							if len(network_param) == 3:
-								run_trials(num_of_trials         = 1,
-										   collected_data_file   = filename,
-										   stimulus_center_deg   = stim_heading_degrees,
-										   N_excitatory          = network_param[0],
-										   N_inhibitory          = network_param[1],
-										   weight_scaling_factor = network_param[2],
-										   sim_time_duration     = sim_time_duration,
-										   synaptic_noise_amount = synaptic_noise_amount
-										  )
-							elif len(network_param) == 4 and len(network_param[3]) == 7:
-								G_inhib2inhib, G_inhib2excit, G_excit2excit, G_excit2inhib, G_extern2inhib, G_extern2excit, stimulus_strength = network_param[3]
-								run_trials(num_of_trials         = 1,
-										   collected_data_file   = filename,
-										   stimulus_center_deg   = stim_heading_degrees,
-										   N_excitatory          = network_param[0],
-										   N_inhibitory          = network_param[1],
-										   weight_scaling_factor = network_param[2],
-										   sim_time_duration     = sim_time_duration,
-										   synaptic_noise_amount = synaptic_noise_amount,
-										   poisson_firing_rate   = neuronal_noise_Hz*Hz,
-										   G_inhib2inhib         = G_inhib2inhib * nS,
-										   G_inhib2excit         = G_inhib2excit * nS,
-										   G_excit2excit         = G_excit2excit * nS,
-										   G_excit2inhib         = G_excit2inhib * nS,
-										   G_extern2inhib        = G_extern2inhib * nS,
-										   G_extern2excit        = G_extern2excit * nS,
-										   stimulus_strength     = stimulus_strength * namp,
-										   available_RAM         = available_RAM, 
-										   weights_skewness      = weights_skewness, 
-										   tau_excit             = tau_excit,
-										   tau_inhib             = tau_inhib
-										  )
-							else:
-								print('ERROR: Parameter values not right.')
+                    for trial in range(1, N_trials+1):
+                        # If the provided tau value is valid 
+                        if tau_membrane is not None and tau_membrane > 0:
+                            tau_excit = tau_membrane * ms
+                            tau_inhib = tau_membrane * ms / 2 # Half of main tau since it needs to be tau_excit>>tau_inhib
+                        else: # If not a valid set it to None so it is ignored
+                            tau_excit = None
+                            tau_inhib = None
+                        
+                        print('Trial {:3} with {:5} neurons, stimulus at {:3}deg, synaptic noise {:3}SNR.'.format(
+                                trial,
+                                Ne,
+                                stim_heading_degrees,
+                                synaptic_noise_amount))
+                        network_param = network_parameters_dict.get(Ne)
+                        if network_param is None:
+                            print('ERROR: Unlisted number of excitatory neurons: {}'.format(Ne))
+                        else:
+                            if len(network_param) == 3:
+                                run_trials(num_of_trials         = 1,
+                                           collected_data_file   = filename,
+                                           stimulus_center_deg   = stim_heading_degrees,
+                                           N_excitatory          = network_param[0],
+                                           N_inhibitory          = network_param[1],
+                                           weight_scaling_factor = network_param[2],
+                                           sim_time_duration     = sim_time_duration,
+                                           synaptic_noise_amount = synaptic_noise_amount
+                                          )
+                            elif len(network_param) == 4 and len(network_param[3]) == 7:
+                                G_inhib2inhib, G_inhib2excit, G_excit2excit, G_excit2inhib, G_extern2inhib, G_extern2excit, stimulus_strength = network_param[3]
+                                run_trials(num_of_trials         = 1,
+                                           collected_data_file   = filename,
+                                           stimulus_center_deg   = stim_heading_degrees,
+                                           N_excitatory          = network_param[0],
+                                           N_inhibitory          = network_param[1],
+                                           weight_scaling_factor = network_param[2],
+                                           sim_time_duration     = sim_time_duration,
+                                           synaptic_noise_amount = synaptic_noise_amount,
+                                           poisson_firing_rate   = neuronal_noise_Hz*Hz,
+                                           G_inhib2inhib         = G_inhib2inhib * nS,
+                                           G_inhib2excit         = G_inhib2excit * nS,
+                                           G_excit2excit         = G_excit2excit * nS,
+                                           G_excit2inhib         = G_excit2inhib * nS,
+                                           G_extern2inhib        = G_extern2inhib * nS,
+                                           G_extern2excit        = G_extern2excit * nS,
+                                           stimulus_strength     = stimulus_strength * namp,
+                                           available_RAM         = available_RAM, 
+                                           weights_skewness      = weights_skewness, 
+                                           tau_excit             = tau_excit,
+                                           tau_inhib             = tau_inhib
+                                          )
+                            else:
+                                print('ERROR: Parameter values not right.')
 
 
     
