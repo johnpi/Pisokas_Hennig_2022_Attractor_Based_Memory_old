@@ -1,0 +1,47 @@
+finished
+run_trials_job.o8835759
+run_trials_job.o8835760
+run_trials_job.o8835761
+run_trials_job.o8835771
+run_trials_job.o8835798
+run_trials_job.o8835818
+run_trials_job.o8835822
+run_trials_job.o8835821
+
+-rw-r--r-- 1 s0093128 eddie_users  246194307 Dec  7 11:38 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_256.npy
+-rw-r--r-- 1 s0093128 eddie_users  526241050 Dec  7 20:40 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise0.1Hz_veddie02_256.npy
+-rw-r--r-- 1 s0093128 eddie_users  809354087 Dec  8 05:51 collected_drift_trials_all_EC_LV_duration300s_noise2.3Hz_veddie02_256.npy
+-rw-r--r-- 1 s0093128 eddie_users  995219742 Dec  8 07:08 collected_drift_trials_all_EC_LV_duration300s_noise0.1Hz_veddie02_256.npy
+-rw-r--r-- 1 s0093128 eddie_users 1192778591 Dec  8 15:54 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_1024.npy
+-rw-r--r-- 1 s0093128 eddie_users 1548291679 Dec  8 16:22 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_512.npy
+-rw-r--r-- 1 s0093128 eddie_users 1548181566 Dec  8 16:40 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise0.1Hz_veddie02_512.npy
+
+It seems while moving the file collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_1024.npy to Done/ a new version of the file was written again slightly larger (1233913256 Dec  8 17:09 collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_1024.npy). I have kept both until I see what is happening.
+
+
+Job 8852476 also is running
+
+
+
+Regarding the other ones there is job 8852475 that will store in
+collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise2.3Hz_veddie02_512.npy
+and 8852463 that will store in  collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise0.1Hz_veddie02_512.npy
+
+str=8835821 && mv run_trials_job.o${str} Done/Output/ && ln -s Done/Output/run_trials_job.o${str} run_trials_job.o${str}
+
+str=8835821 && mv run_trials_job.e${str} Done/Output/ && ln -s Done/Output/run_trials_job.e${str} run_trials_job.e${str}
+
+find . -maxdepth 1 -type f -iname 'run_trials_job.o*' -exec echo "--------------------------------" \; -exec echo {} \; -exec cat {} \;
+
+python3 print_elements_num.py -f /exports/eddie/scratch/s0093128/Data/*.npy
+
+
+file=collected_drift_trials_all_EC_LV_reduced_2_duration300s_noise0.1Hz_veddie02_ && python3 merge_all_files_into_one.py -m 20 -f /exports/eddie/scratch/s0093128/Data/Combined/${file}all.npy -i /exports/eddie/scratch/s0093128/Data/${file}*.npy
+
+source_file="/exports/eddie/scratch/s0093128/Data/Combined/" && link_file="/home/s0093128/Projects/Attractor_Based_Memory_Plaussibility_Study/Data/Combined/" && for f in /exports/eddie/scratch/s0093128/Data/Combined/*.npy; do base_f=$(basename ${f}); ln -s "${f}" "${link_file}${base_f}"; done
+
+
+
+
+
+
